@@ -35,54 +35,73 @@ function formatProduct(item) {
   };
 }
 
-export async function getProducts({ perPage = 24 } = {}) {
-  if (!WC_URL || !WC_KEY || !WC_SECRET) {
-    throw new Error("Faltan variables del .env");
+export async function getProducts({ perPage = 12, page = 1 } = {}) {
+  const cacheKey = `trg_products_page_${page}_${perPage}`;
+  const cached = localStorage.getItem(cacheKey);
+
+  if (cached) {
+    return JSON.parse(cached);
   }
 
-  const url = `${WC_URL}/wp-json/wc/v3/products?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}&per_page=${perPage}&status=publish`;
+  const fields = [
+    "id",
+    "name",
+    "price",
+    "images",
+    "categories",
+    "short_description",
+    "stock_status",
+    "permalink",
+  ].join(",");
+
+  const url = `${WC_URL}/wp-json/wc/v3/products?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}&per_page=${perPage}&page=${page}&status=publish&_fields=${fields}`;
 
   const response = await fetch(url);
-
-  const contentType = response.headers.get("content-type");
-
-  if (!contentType?.includes("application/json")) {
-    const text = await response.text();
-    console.error("Respuesta NO JSON:", text.slice(0, 500));
-    throw new Error("WooCommerce no devolvió JSON");
-  }
 
   if (!response.ok) {
     throw new Error("Error al cargar productos de WooCommerce");
   }
 
   const data = await response.json();
+  const products = data.map(formatProduct);
 
-  return data.map(formatProduct);
+  localStorage.setItem(cacheKey, JSON.stringify(products));
+
+  return products;
 }
 
 export async function getProductById(id) {
-  if (!WC_URL || !WC_KEY || !WC_SECRET) {
-    throw new Error("Faltan variables del .env");
+  const cacheKey = `trg_product_${id}`;
+  const cached = localStorage.getItem(cacheKey);
+
+  if (cached) {
+    return JSON.parse(cached);
   }
 
-  const url = `${WC_URL}/wp-json/wc/v3/products/${id}?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}`;
+  const fields = [
+    "id",
+    "name",
+    "price",
+    "images",
+    "categories",
+    "short_description",
+    "description",
+    "stock_status",
+    "permalink",
+  ].join(",");
+
+  const url = `${WC_URL}/wp-json/wc/v3/products/${id}?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}&_fields=${fields}`;
 
   const response = await fetch(url);
-
-  const contentType = response.headers.get("content-type");
-
-  if (!contentType?.includes("application/json")) {
-    const text = await response.text();
-    console.error("Respuesta NO JSON:", text.slice(0, 500));
-    throw new Error("WooCommerce no devolvió JSON");
-  }
 
   if (!response.ok) {
     throw new Error("Error al cargar el producto");
   }
 
   const data = await response.json();
+  const product = formatProduct(data);
 
-  return formatProduct(data);
+  localStorage.setItem(cacheKey, JSON.stringify(product));
+
+  return product;
 }

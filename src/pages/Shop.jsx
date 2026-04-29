@@ -7,19 +7,64 @@ export function Shop() {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    getProducts({ perPage: 24 })
-      .then(setProducts)
-      .catch((error) => {
+    async function loadInitialProducts() {
+      try {
+        const firstPage = await getProducts({ perPage: 12, page: 1 });
+
+        setProducts(firstPage);
+        setHasMore(firstPage.length === 12);
+        setLoading(false);
+
+        const secondPage = await getProducts({ perPage: 12, page: 2 });
+
+        if (secondPage.length > 0) {
+          setProducts((prev) => {
+            const ids = new Set(prev.map((p) => p.id));
+            const unique = secondPage.filter((p) => !ids.has(p.id));
+            return [...prev, ...unique];
+          });
+
+          setPage(2);
+          setHasMore(secondPage.length === 12);
+        }
+      } catch (error) {
         console.error(error);
         setError("No se pudieron cargar los productos reales.");
-      })
-      .finally(() => setLoading(false));
+        setLoading(false);
+      }
+    }
+
+    loadInitialProducts();
   }, []);
+
+  const loadMoreProducts = async () => {
+    try {
+      setLoadingMore(true);
+
+      const nextPage = page + 1;
+      const data = await getProducts({ perPage: 12, page: nextPage });
+
+      setProducts((prev) => {
+        const ids = new Set(prev.map((p) => p.id));
+        const unique = data.filter((p) => !ids.has(p.id));
+        return [...prev, ...unique];
+      });
+
+      setPage(nextPage);
+      setHasMore(data.length === 12);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const categories = useMemo(() => {
     return ["Todos", ...new Set(products.map((product) => product.category))];
@@ -30,20 +75,21 @@ export function Shop() {
       const matchesCategory =
         activeCategory === "Todos" || product.category === activeCategory;
 
-      const matchesSearch = product.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
+      const text = `${product.name} ${product.category} ${product.description}`.toLowerCase();
+
+      const matchesSearch = text.includes(search.toLowerCase());
 
       return matchesCategory && matchesSearch;
     });
   }, [activeCategory, search, products]);
 
-  const visibleProducts = filteredProducts.slice(0, visibleCount);
+  const canLoadMore =
+    hasMore && activeCategory === "Todos" && search.trim() === "";
 
   return (
     <main className="bg-[#f6f0e7]">
       <section className="relative overflow-hidden px-4 py-10 md:px-6 md:py-16">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#d0a15b55,transparent_35%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#b8874630,transparent_35%)]" />
 
         <div className="relative mx-auto max-w-7xl">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
@@ -86,16 +132,13 @@ export function Shop() {
 
                 <input
                   value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setVisibleCount(12);
-                  }}
-                  placeholder="Buscar producto..."
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar producto, categoría o descripción..."
                   className="w-full rounded-full border border-black/10 bg-[#f6f0e7] py-4 pl-11 pr-5 font-semibold outline-none transition focus:ring-2 focus:ring-black/10"
                 />
               </div>
 
-              <button className="flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-4 text-sm font-black shadow-sm transition hover:bg-[#1f1b16] hover:text-white">
+              <button className="flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-4 text-sm font-black shadow-sm transition hover:bg-[#181511] hover:text-white">
                 <SlidersHorizontal size={18} />
                 Filtros avanzados
               </button>
@@ -105,14 +148,11 @@ export function Shop() {
               {categories.map((category) => (
                 <button
                   key={category}
-                  onClick={() => {
-                    setActiveCategory(category);
-                    setVisibleCount(12);
-                  }}
+                  onClick={() => setActiveCategory(category)}
                   className={`whitespace-nowrap rounded-full px-5 py-3 text-sm font-black transition ${
                     activeCategory === category
-                      ? "bg-[#1f1b16] text-white shadow-lg"
-                      : "bg-[#f6f0e7] text-black/65 hover:bg-[#eee4d5]"
+                      ? "bg-[#181511] text-white shadow-lg"
+                      : "bg-[#f6f0e7] text-black/65 hover:bg-[#eadfce]"
                   }`}
                 >
                   {category}
@@ -127,6 +167,7 @@ export function Shop() {
                 ? "Cargando productos reales..."
                 : `${filteredProducts.length} productos encontrados`}
             </p>
+
             <p>{products.length > 0 ? "WooCommerce conectado" : ""}</p>
           </div>
 
@@ -145,18 +186,19 @@ export function Shop() {
           ) : (
             <>
               <div className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-                {visibleProducts.map((product) => (
+                {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
 
-              {visibleCount < filteredProducts.length && (
+              {canLoadMore && (
                 <div className="mt-12 text-center">
                   <button
-                    onClick={() => setVisibleCount((prev) => prev + 12)}
-                    className="rounded-full bg-[#1f1b16] px-8 py-4 font-black text-white shadow-xl transition hover:scale-[1.02]"
+                    onClick={loadMoreProducts}
+                    disabled={loadingMore}
+                    className="rounded-full bg-[#181511] px-8 py-4 font-black text-white shadow-xl transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    Cargar más productos
+                    {loadingMore ? "Cargando..." : "Cargar más productos"}
                   </button>
                 </div>
               )}
@@ -171,7 +213,7 @@ export function Shop() {
 function MiniBenefit({ icon, title, text }) {
   return (
     <div className="rounded-3xl bg-white/80 p-5 shadow-sm ring-1 ring-black/5">
-      <div className="mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#1f1b16] text-white">
+      <div className="mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#181511] text-white">
         {icon}
       </div>
       <p className="font-black">{title}</p>

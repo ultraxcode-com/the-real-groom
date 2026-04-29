@@ -17,7 +17,7 @@ export function Home() {
   const [featured, setFeatured] = useState([]);
 
   useEffect(() => {
-    getProducts({ perPage: 6 })
+    getProducts({ perPage: 6, page: 1 })
       .then(setFeatured)
       .catch(console.error);
   }, []);
@@ -44,7 +44,7 @@ export function Home() {
 
             <p className="mt-6 max-w-2xl text-base leading-8 text-black/60 md:text-lg">
               Nueva experiencia visual para The Real Groom: productos reales,
-              imágenes reales, carrito en React y una navegación optimizada para móvil.
+              imágenes reales, carrito en React y navegación optimizada para móvil.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -78,16 +78,27 @@ export function Home() {
             className="relative"
           >
             <div className="rounded-[2rem] bg-[#181511] p-3 shadow-2xl md:p-4">
-              <img
-                src={featured[0]?.image || "https://placehold.co/800x800?text=The+Real+Groom"}
-                alt="Producto destacado"
-                className="h-[420px] w-full rounded-[1.5rem] bg-white object-contain p-8 md:h-[560px]"
-              />
+              <div className="grid h-[420px] place-items-center rounded-[1.5rem] bg-white p-8 md:h-[560px]">
+                <div className="text-center">
+                  <div className="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-full bg-[#181511] text-4xl font-black text-white">
+                    TRG
+                  </div>
+                  <p className="text-sm font-black uppercase tracking-[0.25em] text-black/40">
+                    The Real Groom
+                  </p>
+                  <h2 className="mt-3 text-4xl font-black">
+                    Professional Store
+                  </h2>
+                  <p className="mt-3 text-black/50">
+                    WooCommerce conectado · React frontend
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="absolute -bottom-5 left-4 rounded-3xl bg-white p-5 shadow-2xl md:left-8">
-              <p className="text-sm font-bold text-black/50">WooCommerce</p>
-              <p className="text-2xl font-black">Conectado</p>
+              <p className="text-sm font-bold text-black/50">Demo real</p>
+              <p className="text-2xl font-black">React + Woo</p>
             </div>
           </motion.div>
         </div>
@@ -134,32 +145,6 @@ export function Home() {
               ))}
             </div>
           )}
-        </div>
-      </section>
-
-      <section className="px-4 py-16 md:px-6">
-        <div className="mx-auto max-w-7xl rounded-[2rem] bg-[#181511] p-8 text-white md:p-12">
-          <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
-            <div>
-              <p className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-white/40">
-                Propuesta
-              </p>
-              <h2 className="text-3xl font-black md:text-5xl">
-                Mantener la tienda actual, pero con una experiencia visual superior.
-              </h2>
-              <p className="mt-4 max-w-2xl text-white/60">
-                React se encarga del frontend moderno y WooCommerce conserva productos,
-                pedidos, pagos y envíos.
-              </p>
-            </div>
-
-            <Link
-              to="/contacto"
-              className="rounded-full bg-white px-8 py-4 text-center font-black text-[#181511]"
-            >
-              Solicitar propuesta
-            </Link>
-          </div>
         </div>
       </section>
     </main>
