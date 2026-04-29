@@ -10,18 +10,50 @@ import {
   Scissors,
   ShoppingBag,
 } from "lucide-react";
-import { getProducts } from "../services/woocommerce";
+import { getCategories, getProducts } from "../services/woocommerce";
 import { ProductCard } from "../components/ProductCard";
 
 export function Home() {
   const [featured, setFeatured] = useState([]);
+useEffect(() => {
+  getProducts({ perPage: 6, page: 1 })
+    .then(setFeatured)
+    .catch(console.error);
 
-  useEffect(() => {
-    getProducts({ perPage: 6, page: 1 })
-      .then(setFeatured)
-      .catch(console.error);
-  }, []);
+  setTimeout(async () => {
+    try {
+      const categories = await getCategories();
 
+      categories.forEach((category, index) => {
+        setTimeout(() => {
+          getProducts({
+            perPage: 12,
+            page: 1,
+            categoryId: category.id,
+          }).catch(console.error);
+        }, index * 1200);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, 1000);
+
+  setTimeout(() => {
+    getProducts({ perPage: 12, page: 1 }).catch(console.error);
+  }, 1200);
+
+  setTimeout(() => {
+    getProducts({ perPage: 12, page: 2 }).catch(console.error);
+  }, 2500);
+
+  setTimeout(() => {
+    getProducts({ perPage: 12, page: 3 }).catch(console.error);
+  }, 4000);
+
+  setTimeout(() => {
+    getProducts({ perPage: 12, page: 4 }).catch(console.error);
+  }, 5500);
+}, []);
   return (
     <main className="overflow-hidden bg-[#f6f0e7]">
       <section className="relative px-4 py-14 md:px-6 md:py-24">

@@ -23,8 +23,7 @@ function formatProduct(item) {
     price: Number(item.price || 0),
     priceLabel: formatPrice(item.price),
     image:
-      item.images?.[0]?.src ||
-      "https://placehold.co/800x800?text=Producto",
+      item.images?.[0]?.src || "https://placehold.co/800x800?text=Producto",
     images: item.images?.map((img) => img.src) || [],
     description:
       cleanHTML(item.short_description) ||
@@ -35,12 +34,29 @@ function formatProduct(item) {
   };
 }
 
-export async function getProducts({ perPage = 12, page = 1 } = {}) {
-  const cacheKey = `trg_products_page_${page}_${perPage}`;
+function saveProductCache(product) {
+  localStorage.setItem(`trg_product_${product.id}`, JSON.stringify(product));
+}
+
+export async function getProducts({
+  perPage = 12,
+  page = 1,
+  categoryId = null,
+} = {}) {
+  const cacheKey = `trg_products_page_${page}_${perPage}_${
+    categoryId || "all"
+  }`;
+
   const cached = localStorage.getItem(cacheKey);
 
   if (cached) {
-    return JSON.parse(cached);
+    const products = JSON.parse(cached);
+
+    products.forEach((product) => {
+      saveProductCache(product);
+    });
+
+    return products;
   }
 
   const fields = [
@@ -50,11 +66,14 @@ export async function getProducts({ perPage = 12, page = 1 } = {}) {
     "images",
     "categories",
     "short_description",
+    "description",
     "stock_status",
     "permalink",
   ].join(",");
 
-  const url = `${WC_URL}/wp-json/wc/v3/products?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}&per_page=${perPage}&page=${page}&status=publish&_fields=${fields}`;
+  const categoryParam = categoryId ? `&category=${categoryId}` : "";
+
+  const url = `${WC_URL}/wp-json/wc/v3/products?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}&per_page=${perPage}&page=${page}&status=publish${categoryParam}&_fields=${fields}`;
 
   const response = await fetch(url);
 
@@ -64,6 +83,10 @@ export async function getProducts({ perPage = 12, page = 1 } = {}) {
 
   const data = await response.json();
   const products = data.map(formatProduct);
+
+  products.forEach((product) => {
+    saveProductCache(product);
+  });
 
   localStorage.setItem(cacheKey, JSON.stringify(products));
 
@@ -101,7 +124,38 @@ export async function getProductById(id) {
   const data = await response.json();
   const product = formatProduct(data);
 
-  localStorage.setItem(cacheKey, JSON.stringify(product));
+  saveProductCache(product);
 
   return product;
+}
+
+export async function getCategories() {
+  const cacheKey = "trg_categories_cache";
+  const cached = localStorage.getItem(cacheKey);
+
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  const url = `${WC_URL}/wp-json/wc/v3/products/categories?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}&per_page=100&hide_empty=true`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error("Error al cargar categorías");
+  }
+
+  const data = await response.json();
+
+  const categories = data
+    .filter((category) => category.count > 0)
+    .map((category) => ({
+      id: category.id,
+      name: category.name,
+      count: category.count,
+    }));
+
+  localStorage.setItem(cacheKey, JSON.stringify(categories));
+
+  return categories;
 }
