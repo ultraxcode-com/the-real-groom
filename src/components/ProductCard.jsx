@@ -9,37 +9,40 @@ export function ProductCard({ product, index = 0 }) {
   return (
     <motion.article
       layout
-      initial={{ opacity: 0, y: 26, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.42,
-        delay: Math.min(index * 0.035, 0.25),
-        ease: "easeOut",
+        duration: 0.4,
+        delay: Math.min(index * 0.04, 0.25),
       }}
-      className="group overflow-hidden rounded-[2rem] border border-white/70 bg-white shadow-[0_20px_70px_rgba(24,21,17,0.08)] ring-1 ring-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-[0_35px_90px_rgba(24,21,17,0.16)]"
+      className="group overflow-hidden rounded-3xl bg-white shadow-[0_18px_55px_rgba(24,21,17,0.10)] ring-1 ring-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_85px_rgba(24,21,17,0.18)]"
     >
       <Link to={`/producto/${product.id}`} className="block">
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#f0e4d2] via-[#fffaf4] to-[#eadfce]">
-          <div className="absolute left-4 top-4 z-10 rounded-full bg-white/90 px-4 py-2 text-[10px] font-black uppercase tracking-wide text-black/65 shadow-sm backdrop-blur">
-            {product.category}
+        <div className="relative overflow-hidden bg-[#181511]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#d6a84f33,transparent_35%)]" />
+
+          <div className="absolute left-4 top-4 z-10 rounded-xl bg-[#d6a84f] px-3 py-2 text-[10px] font-black uppercase tracking-wide text-[#181511] shadow-lg">
+            Profesional
           </div>
 
           {product.stockStatus === "instock" && (
-            <div className="absolute right-4 top-4 z-10 rounded-full bg-[#181511] px-4 py-2 text-[10px] font-black uppercase tracking-wide text-white shadow-sm">
+            <div className="absolute right-4 top-4 z-10 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wide text-[#181511] shadow-lg">
               En stock
             </div>
           )}
 
-          <img
-            src={product.image}
-            alt={product.name}
-            loading="lazy"
-            className="h-72 w-full object-contain p-6 transition duration-500 group-hover:scale-105 md:h-80"
-          />
+          <div className="relative grid h-72 place-items-center p-6 md:h-80">
+            <img
+              src={product.image}
+              alt={product.name}
+              loading="lazy"
+              className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
+            />
+          </div>
 
-          <div className="absolute inset-x-4 bottom-4 hidden translate-y-6 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 md:block">
-            <div className="flex gap-3">
-              <div className="flex flex-1 items-center justify-center gap-2 rounded-full bg-white px-4 py-3 text-sm font-black text-black shadow-xl">
+          <div className="absolute inset-x-4 bottom-4 hidden translate-y-5 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 md:block">
+            <div className="grid grid-cols-[1fr_auto] gap-3">
+              <div className="flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-black text-[#181511] shadow-xl">
                 <Eye size={17} />
                 Ver detalle
               </div>
@@ -50,7 +53,7 @@ export function ProductCard({ product, index = 0 }) {
                   e.preventDefault();
                   addToCart(product);
                 }}
-                className="grid h-12 w-12 place-items-center rounded-full bg-[#181511] text-white shadow-xl transition hover:scale-105"
+                className="grid h-12 w-12 place-items-center rounded-xl bg-[#d6a84f] text-[#181511] shadow-xl transition hover:bg-[#b8872f]"
               >
                 <ShoppingBag size={18} />
               </button>
@@ -60,29 +63,34 @@ export function ProductCard({ product, index = 0 }) {
       </Link>
 
       <div className="p-5 md:p-6">
+        <p className="mb-2 text-[10px] font-black uppercase tracking-[0.25em] text-[#b8872f]">
+          {product.category}
+        </p>
+
         <Link to={`/producto/${product.id}`}>
-          <h3 className="line-clamp-2 min-h-14 text-lg font-black leading-tight tracking-tight transition group-hover:text-[#8a5a24] md:text-xl">
+          <h3 className="line-clamp-2 min-h-14 text-lg font-black leading-tight text-[#181511] transition group-hover:text-[#b8872f] md:text-xl">
             {product.name}
           </h3>
         </Link>
 
-        <p className="mt-2 line-clamp-2 text-sm leading-6 text-black/50">
+        <p className="mt-3 line-clamp-2 text-sm leading-6 text-black/50">
           {product.description}
         </p>
 
-        <div className="mt-5 flex items-end justify-between gap-4">
+        <div className="mt-5 flex items-end justify-between gap-4 border-t border-black/10 pt-5">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.22em] text-black/35">
               Precio
             </p>
-            <p className="text-xl font-black md:text-2xl">
+            <p className="text-2xl font-black text-[#181511]">
               {product.priceLabel}
             </p>
+            <p className="text-xs font-semibold text-black/40">IVA incluido</p>
           </div>
 
           <button
             onClick={() => addToCart(product)}
-            className="rounded-full bg-[#181511] px-5 py-3 text-sm font-black text-white shadow-lg transition hover:scale-105"
+            className="trg-btn px-5 py-3 text-sm"
           >
             Añadir
           </button>

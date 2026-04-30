@@ -60,113 +60,123 @@ export function ProductDetail() {
 
   return (
     <main className="bg-[#f6f0e7] pb-24 md:pb-0">
-      <section className="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-12">
-        <Link
-          to="/tienda"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-black text-black/55 hover:text-black"
-        >
-          <ArrowLeft size={18} />
-          Volver a la tienda
-        </Link>
+      <section className="relative overflow-hidden bg-[#181511] px-4 py-10 text-white md:px-6 md:py-14">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#d6a84f33,transparent_34%)]" />
 
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
-          <div>
-            <div className="overflow-hidden rounded-[2rem] bg-white p-4 shadow-xl ring-1 ring-black/5">
-              <img
-                src={selectedImage}
-                alt={product.name}
-                className="h-[360px] w-full rounded-[1.5rem] object-contain p-4 md:h-[560px]"
-              />
-            </div>
+        <div className="relative mx-auto max-w-7xl">
+          <Link
+            to="/tienda"
+            className="mb-8 inline-flex items-center gap-2 text-sm font-black text-white/60 transition hover:text-[#d6a84f]"
+          >
+            <ArrowLeft size={18} />
+            Volver a la tienda
+          </Link>
 
-            <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
-              {gallery.slice(0, 6).map((img, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(img)}
-                  className={`min-w-24 overflow-hidden rounded-2xl bg-white p-2 shadow-sm ring-2 ${
-                    selectedImage === img ? "ring-[#181511]" : "ring-transparent"
-                  }`}
-                >
+          <div className="grid gap-8 lg:grid-cols-2 lg:gap-14">
+            <div>
+              <div className="overflow-hidden rounded-[2rem] bg-[#24201a] p-4 shadow-2xl ring-1 ring-[#d6a84f]/25">
+                <div className="rounded-[1.5rem] bg-white">
                   <img
-                    src={img}
-                    alt={`${product.name} ${index + 1}`}
-                    className="h-20 w-20 rounded-xl object-contain"
+                    src={selectedImage}
+                    alt={product.name}
+                    className="h-[360px] w-full rounded-[1.5rem] object-contain p-5 md:h-[560px]"
                   />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="lg:pt-8">
-            <div className="mb-4 flex flex-wrap gap-3">
-              <span className="rounded-full bg-white px-4 py-2 text-xs font-black uppercase tracking-wide text-black/45 shadow-sm">
-                {product.category}
-              </span>
-
-              {product.stockStatus === "instock" && (
-                <span className="rounded-full bg-[#181511] px-4 py-2 text-xs font-black uppercase tracking-wide text-white">
-                  En stock
-                </span>
-              )}
-            </div>
-
-            <h1 className="text-3xl font-black leading-tight tracking-tight md:text-6xl">
-              {product.name}
-            </h1>
-
-            <p className="mt-5 text-4xl font-black">{product.priceLabel}</p>
-
-            <p className="mt-5 text-base leading-8 text-black/60 md:text-lg">
-              {product.description}
-            </p>
-
-            <div className="mt-6 space-y-3">
-              <Line text="Producto real cargado desde WooCommerce" />
-              <Line text="Imágenes, precio y categoría conectados a la API" />
-              <Line text="Compra final compatible con el checkout actual" />
-            </div>
-
-            <div className="mt-8 rounded-[2rem] bg-white p-5 shadow-sm ring-1 ring-black/5">
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <select
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="rounded-full border border-black/10 bg-[#f6f0e7] px-5 py-4 font-black outline-none sm:w-40"
-                >
-                  <option value={1}>Cantidad: 1</option>
-                  <option value={2}>Cantidad: 2</option>
-                  <option value={3}>Cantidad: 3</option>
-                  <option value={4}>Cantidad: 4</option>
-                </select>
-
-                <button
-                  onClick={handleAdd}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#181511] px-6 py-4 font-black text-white shadow-xl transition hover:scale-[1.02]"
-                >
-                  <ShoppingBag size={19} />
-                  {added ? "Añadido ✓" : "Añadir al carrito"}
-                </button>
-
-                <button className="hidden h-14 w-14 place-items-center rounded-full border border-black/10 bg-white shadow-sm sm:grid">
-                  <Heart size={20} />
-                </button>
+                </div>
               </div>
 
-              {added && (
-                <Link
-                  to="/carrito"
-                  className="mt-4 block rounded-full bg-[#b88746] px-6 py-4 text-center font-black text-white"
-                >
-                  Ver carrito
-                </Link>
-              )}
+              <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
+                {gallery.slice(0, 6).map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(img)}
+                    className={`min-w-24 overflow-hidden rounded-2xl bg-white p-2 shadow-sm ring-2 transition ${
+                      selectedImage === img
+                        ? "ring-[#d6a84f]"
+                        : "ring-transparent"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`${product.name} ${index + 1}`}
+                      className="h-20 w-20 rounded-xl object-contain"
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <Trust icon={<Truck size={18} />} title="Envíos CTT" text="24/48h" />
-              <Trust icon={<CreditCard size={18} />} title="Pago seguro" text="Redsys/Bizum" />
-              <Trust icon={<ShieldCheck size={18} />} title="WooCommerce" text="Conectado" />
+            <div className="lg:pt-8">
+              <div className="mb-4 flex flex-wrap gap-3">
+                <span className="rounded-full bg-[#d6a84f] px-4 py-2 text-xs font-black uppercase tracking-wide text-[#181511] shadow-sm">
+                  {product.category}
+                </span>
+
+                {product.stockStatus === "instock" && (
+                  <span className="rounded-full bg-white px-4 py-2 text-xs font-black uppercase tracking-wide text-[#181511]">
+                    En stock
+                  </span>
+                )}
+              </div>
+
+              <h1 className="text-3xl font-black leading-tight tracking-tight md:text-6xl">
+                {product.name}
+              </h1>
+
+              <p className="mt-5 text-4xl font-black text-[#d6a84f]">
+                {product.priceLabel}
+              </p>
+
+              <p className="mt-5 text-base leading-8 text-white/65 md:text-lg">
+                {product.description}
+              </p>
+
+              <div className="mt-6 space-y-3">
+                <Line text="Producto real cargado desde WooCommerce" />
+                <Line text="Precio, stock e imágenes conectados a la tienda actual" />
+                <Line text="Compra final compatible con el sistema existente" />
+              </div>
+
+              <div className="mt-8 rounded-[2rem] bg-white p-5 text-[#181511] shadow-2xl ring-1 ring-[#d6a84f]/20">
+                <div className="flex flex-col gap-4 sm:flex-row">
+                  <select
+                    value={quantity}
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    className="rounded-full border border-black/10 bg-[#f6f0e7] px-5 py-4 font-black outline-none sm:w-40"
+                  >
+                    <option value={1}>Cantidad: 1</option>
+                    <option value={2}>Cantidad: 2</option>
+                    <option value={3}>Cantidad: 3</option>
+                    <option value={4}>Cantidad: 4</option>
+                  </select>
+
+                  <button
+                    onClick={handleAdd}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#d6a84f] px-6 py-4 font-black text-[#181511] shadow-xl transition hover:scale-[1.02] hover:bg-[#b8872f]"
+                  >
+                    <ShoppingBag size={19} />
+                    {added ? "Añadido ✓" : "Añadir al carrito"}
+                  </button>
+
+                  <button className="hidden h-14 w-14 place-items-center rounded-full border border-black/10 bg-white shadow-sm sm:grid">
+                    <Heart size={20} />
+                  </button>
+                </div>
+
+                {added && (
+                  <Link
+                    to="/carrito"
+                    className="mt-4 block rounded-full bg-[#181511] px-6 py-4 text-center font-black text-white"
+                  >
+                    Ver carrito
+                  </Link>
+                )}
+              </div>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <Trust icon={<Truck size={18} />} title="Envíos CTT" text="24/48h" />
+                <Trust icon={<CreditCard size={18} />} title="Pago seguro" text="Redsys/Bizum" />
+                <Trust icon={<ShieldCheck size={18} />} title="WooCommerce" text="Conectado" />
+              </div>
             </div>
           </div>
         </div>
@@ -175,7 +185,7 @@ export function ProductDetail() {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-white p-4 shadow-2xl md:hidden">
         <button
           onClick={handleAdd}
-          className="w-full rounded-full bg-[#181511] py-4 font-black text-white"
+          className="w-full rounded-full bg-[#d6a84f] py-4 font-black text-[#181511]"
         >
           {added ? "Añadido al carrito ✓" : `Añadir · ${product.priceLabel}`}
         </button>
@@ -186,8 +196,8 @@ export function ProductDetail() {
 
 function Line({ text }) {
   return (
-    <p className="flex items-center gap-3 text-sm font-bold text-black/60">
-      <span className="grid h-6 w-6 place-items-center rounded-full bg-[#181511] text-white">
+    <p className="flex items-center gap-3 text-sm font-bold text-white/65">
+      <span className="grid h-6 w-6 place-items-center rounded-full bg-[#d6a84f] text-[#181511]">
         <Check size={14} />
       </span>
       {text}
@@ -197,12 +207,12 @@ function Line({ text }) {
 
 function Trust({ icon, title, text }) {
   return (
-    <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5">
-      <div className="mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#181511] text-white">
+    <div className="rounded-3xl bg-[#24201a] p-5 shadow-sm ring-1 ring-[#d6a84f]/20">
+      <div className="mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#d6a84f] text-[#181511]">
         {icon}
       </div>
-      <p className="font-black">{title}</p>
-      <p className="text-sm text-black/50">{text}</p>
+      <p className="font-black text-white">{title}</p>
+      <p className="text-sm text-white/50">{text}</p>
     </div>
   );
 }

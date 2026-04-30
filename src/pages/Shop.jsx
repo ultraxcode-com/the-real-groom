@@ -15,79 +15,75 @@ import { getCategories, getProducts } from "../services/woocommerce";
 export function Shop() {
   const scrollRef = useRef(null);
 
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [search, setSearch] = useState("");
+
   const [activeCategory, setActiveCategory] = useState({
     id: null,
     name: "Todos",
   });
-
-  const [search, setSearch] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
-    async function loadInitialData() {
+    async function loadData() {
       try {
-        const [categoriesData, productsData] = await Promise.all([
+        const [catData, prodData] = await Promise.all([
           getCategories(),
           getProducts({ perPage: 12, page: 1 }),
         ]);
 
-        setCategories(categoriesData);
-        setProducts(productsData);
-        setHasMore(productsData.length === 12);
+        setCategories(catData);
+        setProducts(prodData);
+        setHasMore(prodData.length === 12);
       } catch (error) {
         console.error(error);
-        setError("No se pudieron cargar los productos reales.");
       } finally {
         setLoading(false);
       }
     }
 
-    loadInitialData();
+    loadData();
   }, []);
 
   const scrollCategories = (direction) => {
     if (!scrollRef.current) return;
 
     scrollRef.current.scrollBy({
-      left: direction === "left" ? -320 : 320,
+      left: direction === "left" ? -340 : 340,
       behavior: "smooth",
     });
   };
 
   const handleAllClick = async () => {
+    setActiveCategory({ id: null, name: "Todos" });
+    setSearch("");
+    setPage(1);
+    setLoading(true);
+
     try {
-      setActiveCategory({ id: null, name: "Todos" });
-      setSearch("");
-      setPage(1);
-      setLoading(true);
-
       const data = await getProducts({ perPage: 12, page: 1 });
-
       setProducts(data);
       setHasMore(data.length === 12);
     } catch (error) {
       console.error(error);
-      setError("No se pudieron cargar los productos.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleCategoryClick = async (category) => {
-    try {
-      setActiveCategory(category);
-      setSearch("");
-      setPage(1);
-      setLoading(true);
+    setActiveCategory(category);
+    setSearch("");
+    setPage(1);
+    setLoading(true);
 
+    try {
       const data = await getProducts({
         perPage: 12,
         page: 1,
@@ -98,16 +94,15 @@ export function Shop() {
       setHasMore(data.length === 12);
     } catch (error) {
       console.error(error);
-      setError("No se pudieron cargar los productos de esta categoría.");
     } finally {
       setLoading(false);
     }
   };
 
   const loadMoreProducts = async () => {
-    try {
-      setLoadingMore(true);
+    setLoadingMore(true);
 
+    try {
       const nextPage = page + 1;
 
       const data = await getProducts({
@@ -117,9 +112,9 @@ export function Shop() {
       });
 
       setProducts((prev) => {
-        const ids = new Set(prev.map((product) => product.id));
-        const uniqueProducts = data.filter((product) => !ids.has(product.id));
-        return [...prev, ...uniqueProducts];
+        const ids = new Set(prev.map((item) => item.id));
+        const unique = data.filter((item) => !ids.has(item.id));
+        return [...prev, ...unique];
       });
 
       setPage(nextPage);
@@ -138,18 +133,19 @@ export function Shop() {
 
   return (
     <main className="min-h-screen bg-[#f6f0e7]">
-      <section className="relative overflow-hidden px-4 py-10 md:px-6 md:py-16">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#b8874640,transparent_34%),radial-gradient(circle_at_bottom_left,#18151118,transparent_34%)]" />
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-[420px] bg-[#181511]" />
+        <div className="absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(circle_at_top_right,#d6a84f33,transparent_35%)]" />
 
-        <div className="relative mx-auto max-w-7xl">
+        <div className="relative mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55 }}
-            className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:items-end"
+            className="grid gap-8 text-white lg:grid-cols-[1.15fr_.85fr] lg:items-end"
           >
             <div>
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-4 py-2 text-xs font-black uppercase tracking-wide shadow-sm backdrop-blur">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-xl border border-[#d6a84f]/30 bg-[#24201a] px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-[#d6a84f]">
                 <Sparkles size={15} />
                 Catálogo conectado a WooCommerce
               </div>
@@ -158,7 +154,7 @@ export function Shop() {
                 Tienda profesional para groomers.
               </h1>
 
-              <p className="mt-5 max-w-2xl text-base leading-7 text-black/60 md:text-lg md:leading-8">
+              <p className="mt-5 max-w-2xl text-base leading-7 text-white/70 md:text-lg md:leading-8">
                 Productos reales, imágenes reales, precios reales y categorías
                 cargadas directamente desde WooCommerce.
               </p>
@@ -167,13 +163,13 @@ export function Shop() {
             <div className="grid gap-3 sm:grid-cols-2">
               <MiniBenefit
                 icon={<Truck size={18} />}
-                title="Envíos CTT"
+                title="Envíos 24/48h"
                 text="Logística actual"
               />
               <MiniBenefit
                 icon={<ShieldCheck size={18} />}
                 title="Pago seguro"
-                text="Redsys / Bizum"
+                text="WooCommerce"
               />
             </div>
           </motion.div>
@@ -182,43 +178,43 @@ export function Shop() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.08 }}
-            className="mt-8 rounded-[2rem] border border-white/70 bg-white/80 p-4 shadow-[0_25px_80px_rgba(24,21,17,0.08)] backdrop-blur-xl md:p-5"
+            className="mt-8 rounded-[2rem] border border-[#d6a84f]/20 bg-[#181511] p-5 shadow-[0_25px_80px_rgba(0,0,0,0.24)]"
           >
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="relative w-full lg:max-w-lg">
                 <Search
-                  className="absolute left-5 top-1/2 -translate-y-1/2 text-black/35"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white/45"
                   size={18}
                 />
 
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar por producto, categoría o descripción..."
-                  className="w-full rounded-full border border-black/10 bg-[#f6f0e7] py-4 pl-12 pr-5 font-semibold outline-none transition focus:bg-white focus:ring-2 focus:ring-[#181511]/10"
+                  placeholder="Buscar productos..."
+                  className="w-full rounded-xl border border-white/10 bg-[#24201a] py-4 pl-11 pr-5 font-semibold text-white outline-none placeholder:text-white/45 focus:border-[#d6a84f] focus:ring-2 focus:ring-[#d6a84f]/20"
                 />
               </div>
 
-              <button className="flex items-center justify-center gap-2 rounded-full border border-black/10 bg-white px-5 py-4 text-sm font-black shadow-sm transition hover:-translate-y-0.5 hover:bg-[#181511] hover:text-white">
+              <button className="trg-btn-dark">
                 <SlidersHorizontal size={18} />
-                Filtros avanzados
+                Filtros
               </button>
             </div>
 
             <div className="relative mt-6">
-              <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-12 bg-gradient-to-r from-white/90 to-transparent" />
-              <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-12 bg-gradient-to-l from-white/90 to-transparent" />
+              <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-12 bg-gradient-to-r from-[#181511] to-transparent" />
+              <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-12 bg-gradient-to-l from-[#181511] to-transparent" />
 
               <button
                 onClick={() => scrollCategories("left")}
-                className="absolute left-0 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white shadow-xl ring-1 ring-black/10 transition hover:scale-110"
+                className="absolute left-0 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-xl bg-[#d6a84f] text-[#181511] shadow-xl transition hover:scale-105"
               >
                 <ChevronLeft size={20} />
               </button>
 
               <button
                 onClick={() => scrollCategories("right")}
-                className="absolute right-0 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white shadow-xl ring-1 ring-black/10 transition hover:scale-110"
+                className="absolute right-0 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-xl bg-[#d6a84f] text-[#181511] shadow-xl transition hover:scale-105"
               >
                 <ChevronRight size={20} />
               </button>
@@ -247,7 +243,7 @@ export function Shop() {
             </div>
           </motion.div>
 
-          <div className="mt-6 flex flex-col gap-3 text-sm font-bold text-black/45 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-6 flex flex-col gap-3 text-sm font-bold text-black/50 sm:flex-row sm:items-center sm:justify-between">
             <p>
               {loading
                 ? "Cargando productos reales..."
@@ -260,12 +256,6 @@ export function Shop() {
                 : `Categoría: ${activeCategory.name}`}
             </p>
           </div>
-
-          {error && (
-            <div className="mt-8 rounded-2xl bg-red-100 p-5 font-bold text-red-700">
-              {error}
-            </div>
-          )}
 
           {loading ? (
             <div className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
@@ -290,7 +280,7 @@ export function Shop() {
                 </motion.div>
               ) : (
                 <div className="mt-10 rounded-[2rem] bg-white p-10 text-center shadow-sm ring-1 ring-black/5">
-                  <h2 className="text-2xl font-black">
+                  <h2 className="text-2xl font-black text-[#181511]">
                     No encontramos productos
                   </h2>
                   <p className="mt-3 text-black/55">
@@ -304,7 +294,7 @@ export function Shop() {
                   <button
                     onClick={loadMoreProducts}
                     disabled={loadingMore}
-                    className="rounded-full bg-[#181511] px-9 py-4 font-black text-white shadow-xl transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="trg-btn"
                   >
                     {loadingMore ? "Cargando..." : "Cargar más productos"}
                   </button>
@@ -322,17 +312,18 @@ function CategoryButton({ active, onClick, label, count }) {
   return (
     <button
       onClick={onClick}
-      className={`group whitespace-nowrap rounded-full px-5 py-3 text-sm font-black transition ${
+      className={`whitespace-nowrap rounded-xl px-5 py-3 text-sm font-black tracking-wide transition ${
         active
-          ? "bg-[#181511] text-white shadow-xl"
-          : "bg-white text-black/65 shadow-sm ring-1 ring-black/5 hover:bg-[#eadfce] hover:text-black"
+          ? "bg-[#d6a84f] text-[#181511] shadow-xl"
+          : "bg-[#24201a] text-white/80 ring-1 ring-white/10 hover:bg-[#d6a84f] hover:text-[#181511]"
       }`}
     >
       <span>{label}</span>
+
       {typeof count === "number" && (
         <span
-          className={`ml-2 rounded-full px-2 py-1 text-[10px] ${
-            active ? "bg-white/15 text-white" : "bg-black/5 text-black/45"
+          className={`ml-2 rounded-md px-2 py-1 text-[10px] ${
+            active ? "bg-black/10 text-[#181511]" : "bg-white/10 text-white/70"
           }`}
         >
           {count}
@@ -344,12 +335,12 @@ function CategoryButton({ active, onClick, label, count }) {
 
 function MiniBenefit({ icon, title, text }) {
   return (
-    <div className="rounded-3xl border border-white/70 bg-white/80 p-5 shadow-[0_20px_60px_rgba(24,21,17,0.06)] backdrop-blur">
-      <div className="mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#181511] text-white">
+    <div className="rounded-2xl border border-[#d6a84f]/20 bg-[#24201a] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.16)]">
+      <div className="mb-3 grid h-10 w-10 place-items-center rounded-xl bg-[#d6a84f] text-[#181511]">
         {icon}
       </div>
-      <p className="font-black">{title}</p>
-      <p className="text-sm text-black/50">{text}</p>
+      <p className="font-black text-white">{title}</p>
+      <p className="text-sm font-semibold text-white/55">{text}</p>
     </div>
   );
 }
@@ -364,7 +355,7 @@ function ProductSkeleton() {
         <div className="h-4 w-2/3 rounded-full bg-black/10" />
         <div className="flex items-center justify-between pt-4">
           <div className="h-7 w-24 rounded-full bg-black/10" />
-          <div className="h-11 w-24 rounded-full bg-black/10" />
+          <div className="h-11 w-24 rounded-xl bg-black/10" />
         </div>
       </div>
     </div>

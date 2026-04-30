@@ -40,13 +40,15 @@ export async function getProducts({
   categoryId = null,
 } = {}) {
   const cacheKey = `trg_products_page_${page}_${perPage}_${categoryId || "all"}`;
-  const cached = localStorage.getItem(cacheKey);
+const cached = localStorage.getItem(cacheKey);
 
-  if (cached) {
-    const products = JSON.parse(cached);
-    products.forEach(saveProductCache);
-    return products;
+if (cached) {
+  try {
+    return JSON.parse(cached);
+  } catch (error) {
+    localStorage.removeItem(cacheKey);
   }
+}
 
   const categoryParam = categoryId ? `&categoryId=${categoryId}` : "";
 
