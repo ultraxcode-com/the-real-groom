@@ -1,7 +1,3 @@
-const WC_URL = import.meta.env.VITE_WC_URL;
-const WC_KEY = import.meta.env.VITE_WC_KEY;
-const WC_SECRET = import.meta.env.VITE_WC_SECRET;
-
 function cleanHTML(text = "") {
   return text.replace(/<[^>]*>/g, "").trim();
 }
@@ -43,39 +39,20 @@ export async function getProducts({
   page = 1,
   categoryId = null,
 } = {}) {
-  const cacheKey = `trg_products_page_${page}_${perPage}_${
-    categoryId || "all"
-  }`;
-
+  const cacheKey = `trg_products_page_${page}_${perPage}_${categoryId || "all"}`;
   const cached = localStorage.getItem(cacheKey);
 
   if (cached) {
     const products = JSON.parse(cached);
-
-    products.forEach((product) => {
-      saveProductCache(product);
-    });
-
+    products.forEach(saveProductCache);
     return products;
   }
 
-  const fields = [
-    "id",
-    "name",
-    "price",
-    "images",
-    "categories",
-    "short_description",
-    "description",
-    "stock_status",
-    "permalink",
-  ].join(",");
+  const categoryParam = categoryId ? `&categoryId=${categoryId}` : "";
 
-  const categoryParam = categoryId ? `&category=${categoryId}` : "";
-
-  const url = `${WC_URL}/wp-json/wc/v3/products?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}&per_page=${perPage}&page=${page}&status=publish${categoryParam}&_fields=${fields}`;
-
-  const response = await fetch(url);
+  const response = await fetch(
+    `/api/woocommerce/products?perPage=${perPage}&page=${page}${categoryParam}`
+  );
 
   if (!response.ok) {
     throw new Error("Error al cargar productos de WooCommerce");
@@ -84,10 +61,7 @@ export async function getProducts({
   const data = await response.json();
   const products = data.map(formatProduct);
 
-  products.forEach((product) => {
-    saveProductCache(product);
-  });
-
+  products.forEach(saveProductCache);
   localStorage.setItem(cacheKey, JSON.stringify(products));
 
   return products;
@@ -101,21 +75,7 @@ export async function getProductById(id) {
     return JSON.parse(cached);
   }
 
-  const fields = [
-    "id",
-    "name",
-    "price",
-    "images",
-    "categories",
-    "short_description",
-    "description",
-    "stock_status",
-    "permalink",
-  ].join(",");
-
-  const url = `${WC_URL}/wp-json/wc/v3/products/${id}?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}&_fields=${fields}`;
-
-  const response = await fetch(url);
+  const response = await fetch(`/api/woocommerce/product?id=${id}`);
 
   if (!response.ok) {
     throw new Error("Error al cargar el producto");
@@ -137,9 +97,7 @@ export async function getCategories() {
     return JSON.parse(cached);
   }
 
-  const url = `${WC_URL}/wp-json/wc/v3/products/categories?consumer_key=${WC_KEY}&consumer_secret=${WC_SECRET}&per_page=100&hide_empty=true`;
-
-  const response = await fetch(url);
+  const response = await fetch("/api/woocommerce/categories");
 
   if (!response.ok) {
     throw new Error("Error al cargar categorías");
