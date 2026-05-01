@@ -129,21 +129,20 @@ export function Hero() {
             to={product?.id ? `/producto/${product.id}` : "/tienda"}
             className="group relative block h-[380px] overflow-hidden rounded-[2rem] md:h-[520px]"
           >
-            <AnimatePresence mode="wait">
-              {product?.image && (
-                <motion.img
-                  key={product.id}
-                  src={product.image}
-                  alt={product.name}
-                  initial={{ opacity: 0, scale: 1.05 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
-                />
-              )}
-            </AnimatePresence>
-
+          <AnimatePresence mode="wait">
+  {product?.image && (
+    <motion.img
+      key={product.id}
+      src={product.image}
+      alt={product.name}
+      initial={{ opacity: 0, scale: 1.05 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+      className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
+    />
+  )}
+</AnimatePresence>
             {/* Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
 
