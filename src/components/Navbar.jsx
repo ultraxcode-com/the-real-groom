@@ -21,6 +21,8 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-[#D4AF37]/15 bg-[#100e0b]/90 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
+        
+        {/* LOGO */}
         <Link to="/" className="flex items-center gap-3">
           <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] text-lg font-black text-[#181511] shadow-[0_0_22px_rgba(212,175,55,0.35)]">
             TRG
@@ -36,28 +38,35 @@ export function Navbar() {
           </div>
         </Link>
 
+        {/* DESKTOP MENU */}
         <nav className="hidden items-center gap-8 md:flex">
           <NavLink to="/" className={navClass}>
             Inicio
           </NavLink>
+
           <NavLink to="/tienda" className={navClass}>
             Tienda
           </NavLink>
+
           <NavLink to="/cursos" className={navClass}>
             Cursos
           </NavLink>
-         <NavLink to="/the-real-groom" className={navClass}>
-  The Real Groom
-</NavLink>
+
+          <NavLink to="/the-real-groom" className={navClass}>
+            The Real Groom
+          </NavLink>
+
           <NavLink to="/contacto" className={navClass}>
             Contacto
           </NavLink>
         </nav>
 
+        {/* CART DESKTOP */}
         <div className="hidden md:block">
           <CartButton cartCount={cartCount} />
         </div>
 
+        {/* MOBILE BUTTON */}
         <button
           onClick={() => setOpen((prev) => !prev)}
           className="grid h-11 w-11 place-items-center rounded-xl border border-[#D4AF37]/25 bg-[#24201a] text-white md:hidden"
@@ -66,42 +75,33 @@ export function Navbar() {
         </button>
       </div>
 
+      {/* MOBILE MENU */}
       {open && (
         <div className="border-t border-[#D4AF37]/15 bg-[#100e0b] px-4 py-5 md:hidden">
           <nav className="flex flex-col gap-4">
+
             <NavLink onClick={() => setOpen(false)} to="/" className={navClass}>
               Inicio
             </NavLink>
 
-            <NavLink
-              onClick={() => setOpen(false)}
-              to="/tienda"
-              className={navClass}
-            >
+            <NavLink onClick={() => setOpen(false)} to="/tienda" className={navClass}>
               Tienda
             </NavLink>
 
-            <NavLink
-              onClick={() => setOpen(false)}
-              to="/cursos"
-              className={navClass}
-            >
+            <NavLink onClick={() => setOpen(false)} to="/cursos" className={navClass}>
               Cursos
             </NavLink>
 
+            {/* 🔥 CORREGIDO */}
             <NavLink
               onClick={() => setOpen(false)}
-              to="/sobre-nosotros"
+              to="/the-real-groom"
               className={navClass}
             >
-              Sobre nosotros
+              The Real Groom
             </NavLink>
 
-            <NavLink
-              onClick={() => setOpen(false)}
-              to="/contacto"
-              className={navClass}
-            >
+            <NavLink onClick={() => setOpen(false)} to="/contacto" className={navClass}>
               Contacto
             </NavLink>
 
