@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  MapPin,
-  Quote,
-  Scissors,
-  Sparkles,
-  Users,
-} from "lucide-react";
+import { MapPin, Quote, Scissors, Users } from "lucide-react";
 import { getCategories, getProducts } from "../services/woocommerce";
-import { ProductCard } from "../components/ProductCard";
 import { Hero } from "../components/Hero";
+import { Promociones } from "../components/Promociones";
+import { PetfumeSection } from "../components/PetfumeSection";
+
+const goldText =
+  "bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] bg-clip-text text-transparent drop-shadow-[0_0_14px_rgba(212,175,55,0.25)]";
+
+const goldButton =
+  "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] px-6 py-3 font-black text-[#181511] shadow-[0_0_24px_rgba(212,175,55,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_0_34px_rgba(212,175,55,0.55)]";
 
 export function Home() {
   const [featured, setFeatured] = useState([]);
@@ -18,68 +18,42 @@ export function Home() {
 
   useEffect(() => {
     getProducts({ perPage: 6, page: 1 })
-      .then(setFeatured)
+      .then((data) => setFeatured(Array.isArray(data) ? data : []))
       .catch(console.error);
 
-    getCategories().then(setCategories).catch(console.error);
-
-    setTimeout(async () => {
-      try {
-        const categoriesData = await getCategories();
-
-        categoriesData.forEach((category, index) => {
-          setTimeout(() => {
-            getProducts({
-              perPage: 12,
-              page: 1,
-              categoryId: category.id,
-            }).catch(console.error);
-          }, index * 1200);
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    }, 1000);
-
-    setTimeout(
-      () => getProducts({ perPage: 12, page: 1 }).catch(console.error),
-      1200
-    );
-    setTimeout(
-      () => getProducts({ perPage: 12, page: 2 }).catch(console.error),
-      2500
-    );
-    setTimeout(
-      () => getProducts({ perPage: 12, page: 3 }).catch(console.error),
-      4000
-    );
+    getCategories()
+      .then((data) => setCategories(Array.isArray(data) ? data : []))
+      .catch(console.error);
   }, []);
 
   return (
-    <main className="overflow-hidden bg-[#f6f0e7]">
+    <main className="overflow-hidden bg-[#181511] text-white">
       <Hero product={featured} />
 
-      <section className="bg-[#181511] px-4 py-5 text-white md:px-6">
+      <section className="border-y border-[#D4AF37]/15 bg-[#100e0b] px-4 py-5 md:px-6">
         <div className="mx-auto grid max-w-7xl gap-4 text-sm font-black uppercase tracking-wide text-white/70 md:grid-cols-3">
           <p>Envío gratis en España desde 75€</p>
-          <p className="text-[#d6a84f]">Productos creados por y para groomers</p>
+          <p className={goldText}>Productos y cursos para groomers</p>
           <p>Distribución profesional disponible</p>
         </div>
       </section>
+
+      <Promociones />
 
       <section className="px-4 py-16 md:px-6">
         <div className="mx-auto max-w-7xl">
           <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <p className="mb-2 text-sm font-black uppercase tracking-[0.25em] text-[#b8872f]">
+              <p className={`mb-2 text-sm font-black uppercase tracking-[0.25em] ${goldText}`}>
                 Categorías
               </p>
-              <h2 className="text-4xl font-black text-[#181511] md:text-6xl">
+
+              <h2 className="text-4xl font-black text-white md:text-6xl">
                 Todo para el grooming profesional
               </h2>
             </div>
 
-            <Link to="/tienda" className="trg-btn">
+            <Link to="/tienda" className={goldButton}>
               Ver todas
             </Link>
           </div>
@@ -92,10 +66,6 @@ export function Home() {
                   { id: 2, name: "Cosmética", count: 0 },
                   { id: 3, name: "Peines", count: 0 },
                   { id: 4, name: "Accesorios", count: 0 },
-                  { id: 5, name: "Cardas", count: 0 },
-                  { id: 6, name: "Máquinas", count: 0 },
-                  { id: 7, name: "Cuchillas", count: 0 },
-                  { id: 8, name: "Secadores", count: 0 },
                 ]).map((category) => (
               <CategoryCard key={category.id} category={category} />
             ))}
@@ -103,83 +73,12 @@ export function Home() {
         </div>
       </section>
 
+      <PetfumeSection />
+
       <section className="px-4 py-16 md:px-6">
-        <div className="mx-auto grid max-w-7xl gap-10 rounded-[2.5rem] bg-white p-8 shadow-xl ring-1 ring-black/5 lg:grid-cols-[1fr_.8fr] lg:items-center md:p-12">
+        <div className="mx-auto grid max-w-7xl gap-8 rounded-[2.5rem] border border-[#D4AF37]/20 bg-[#100e0b] p-8 shadow-2xl lg:grid-cols-[1fr_auto] lg:items-center md:p-12">
           <div>
-            <p className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-[#b8872f]">
-              Petfume
-            </p>
-
-            <h2 className="text-4xl font-black leading-tight text-[#181511] md:text-6xl">
-              Alta perfumería natural para mascotas.
-            </h2>
-
-            <p className="mt-5 max-w-3xl text-lg leading-8 text-black/55">
-              Una línea pensada para elevar el acabado, la imagen y la
-              experiencia del grooming profesional, presentada de forma más
-              clara, elegante y orientada a la conversión.
-            </p>
-
-            <Link to="/tienda" className="trg-btn mt-8">
-              Ver productos Petfume
-              <ArrowRight size={18} />
-            </Link>
-          </div>
-
-          <div className="rounded-[2rem] bg-[#181511] p-8 text-white">
-            <Sparkles className="mb-5 text-[#d6a84f]" size={34} />
-            <h3 className="text-3xl font-black">
-              Calidad, aroma y presentación profesional.
-            </h3>
-            <p className="mt-4 leading-8 text-white/60">
-              El objetivo visual es mantener la esencia premium de la marca,
-              pero mejorar la organización de la información y reducir tiempos
-              de espera.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-4 py-16 md:px-6">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <p className="mb-2 text-sm font-black uppercase tracking-[0.25em] text-[#b8872f]">
-                Selección 2025
-              </p>
-              <h2 className="text-4xl font-black text-[#181511] md:text-6xl">
-                Productos destacados reales
-              </h2>
-            </div>
-
-            <Link to="/tienda" className="trg-btn">
-              Ver catálogo completo
-            </Link>
-          </div>
-
-          {featured.length === 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-96 animate-pulse rounded-[2rem] bg-white"
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {featured.map((product, index) => (
-                <ProductCard key={product.id} product={product} index={index} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      <section className="px-4 py-16 md:px-6">
-        <div className="mx-auto grid max-w-7xl gap-8 rounded-[2.5rem] bg-[#181511] p-8 text-white shadow-2xl ring-1 ring-[#d6a84f]/20 lg:grid-cols-[1fr_auto] lg:items-center md:p-12">
-          <div>
-            <p className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-[#d6a84f]">
+            <p className={`mb-3 text-sm font-black uppercase tracking-[0.25em] ${goldText}`}>
               Hazte distribuidor
             </p>
 
@@ -188,13 +87,12 @@ export function Home() {
             </h2>
 
             <p className="mt-4 max-w-2xl text-white/60">
-              Una sección pensada para profesionales que quieran distribuir
-              productos de la marca, con información clara, contacto directo y
-              una presentación más comercial.
+              Productos profesionales, cosmética, herramientas y formación para
+              groomers que quieren elevar la calidad de su salón.
             </p>
           </div>
 
-          <Link to="/contacto" className="trg-btn">
+          <Link to="/contacto" className={goldButton}>
             Solicitar información
           </Link>
         </div>
@@ -203,10 +101,11 @@ export function Home() {
       <section className="px-4 py-16 md:px-6">
         <div className="mx-auto max-w-7xl">
           <div className="mb-10">
-            <p className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-[#b8872f]">
+            <p className={`mb-3 text-sm font-black uppercase tracking-[0.25em] ${goldText}`}>
               Nuestros valores
             </p>
-            <h2 className="text-4xl font-black text-[#181511] md:text-6xl">
+
+            <h2 className="text-4xl font-black text-white md:text-6xl">
               ¿Qué hace únicos a The Real Groom?
             </h2>
           </div>
@@ -214,19 +113,19 @@ export function Home() {
           <div className="grid gap-5 md:grid-cols-4">
             <ValueCard
               title="Calidad"
-              text="Materiales y productos pensados para un uso profesional."
+              text="Productos y herramientas pensadas para uso profesional."
             />
             <ValueCard
-              title="Innovación"
-              text="Una marca en constante evolución para mejorar el servicio."
+              title="Formación"
+              text="Cursos y recursos para expertos en grooming."
             />
             <ValueCard
-              title="Excelencia"
-              text="Cuidado en cada detalle, desde el producto hasta la experiencia."
+              title="Experiencia"
+              text="Más de 5 años de experiencia en estilismo canino."
             />
             <ValueCard
               title="Orgullo profesional"
-              text="Herramientas creadas por y para groomers."
+              text="Una marca creada para groomers exigentes."
             />
           </div>
         </div>
@@ -234,42 +133,42 @@ export function Home() {
 
       <section className="px-4 py-16 md:px-6">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[.8fr_1fr]">
-          <div className="rounded-[2.5rem] bg-[#181511] p-8 text-white shadow-xl ring-1 ring-[#d6a84f]/20 md:p-12">
-            <Users className="mb-5 text-[#d6a84f]" size={36} />
-            <p className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-[#d6a84f]">
+          <div className="rounded-[2.5rem] border border-[#D4AF37]/20 bg-[#100e0b] p-8 shadow-xl md:p-12">
+            <Users className="mb-5 text-[#D4AF37] drop-shadow-[0_0_14px_rgba(212,175,55,0.35)]" size={36} />
+
+            <p className={`mb-3 text-sm font-black uppercase tracking-[0.25em] ${goldText}`}>
               Historia
             </p>
+
             <h2 className="text-4xl font-black md:text-5xl">
               Una marca con visión profesional.
             </h2>
+
             <p className="mt-5 leading-8 text-white/60">
-              La nueva versión debe mantener la historia, personalidad y
-              confianza de la marca, pero con una presentación más limpia,
-              rápida y fácil de navegar.
+              The Real Groom nace desde la experiencia en estilismo canino y la
+              formación de profesionales del grooming.
             </p>
           </div>
 
-          <div className="rounded-[2.5rem] bg-white p-8 shadow-xl ring-1 ring-black/5 md:p-12">
-            <p className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-[#b8872f]">
+          <div className="rounded-[2.5rem] border border-[#D4AF37]/20 bg-[#24201a] p-8 shadow-xl md:p-12">
+            <p className={`mb-3 text-sm font-black uppercase tracking-[0.25em] ${goldText}`}>
               Peluquería canina y felina en Córdoba
             </p>
 
-            <h2 className="text-4xl font-black text-[#181511] md:text-5xl">
-              Atención profesional, tienda física y asesoramiento.
+            <h2 className="text-4xl font-black text-white md:text-5xl">
+              Tienda física, asesoramiento y atención profesional.
             </h2>
 
-            <p className="mt-5 leading-8 text-black/55">
-              The Real Groom cuenta con presencia física para ofrecer productos,
-              asesoramiento y servicios especializados de peluquería canina y
-              felina.
+            <p className="mt-5 leading-8 text-white/60">
+              Presencia física para ofrecer productos, servicios especializados
+              y atención directa a profesionales y clientes.
             </p>
 
-            <div className="mt-6 space-y-3 text-sm font-bold text-black/60">
+            <div className="mt-6 space-y-3 text-sm font-bold text-white/65">
               <p className="flex items-center gap-3">
-                <MapPin className="text-[#b8872f]" size={18} />
+                <MapPin className="text-[#D4AF37] drop-shadow-[0_0_12px_rgba(212,175,55,0.35)]" size={18} />
                 Fernando Amor y Mayor, 1, Noroeste, 14011 Córdoba
               </p>
-              <p>Horario: 10:00h - 14:00h / 17:00h - 20:00h</p>
               <p>Teléfono tienda: 621 33 25 37</p>
               <p>Reservas peluquería: 722 593 888</p>
             </div>
@@ -280,10 +179,11 @@ export function Home() {
       <section className="px-4 py-16 md:px-6">
         <div className="mx-auto max-w-7xl">
           <div className="mb-10">
-            <p className="mb-3 text-sm font-black uppercase tracking-[0.25em] text-[#b8872f]">
+            <p className={`mb-3 text-sm font-black uppercase tracking-[0.25em] ${goldText}`}>
               Testimonios
             </p>
-            <h2 className="text-4xl font-black text-[#181511] md:text-6xl">
+
+            <h2 className="text-4xl font-black text-white md:text-6xl">
               Confianza profesional
             </h2>
           </div>
@@ -302,10 +202,10 @@ export function Home() {
 function CategoryCard({ category }) {
   return (
     <Link
-      to="/tienda"
-      className="group rounded-[2rem] bg-[#181511] p-7 text-white shadow-xl ring-1 ring-[#d6a84f]/20 transition hover:-translate-y-1 hover:shadow-2xl"
+      to={`/tienda?category=${category.id}`}
+      className="group rounded-[2rem] border border-[#D4AF37]/20 bg-[#24201a] p-7 text-white shadow-xl transition hover:-translate-y-1 hover:border-[#F4E6C3]/50 hover:shadow-[0_0_30px_rgba(212,175,55,0.2)]"
     >
-      <div className="mb-5 grid h-12 w-12 place-items-center rounded-xl bg-[#d6a84f] text-[#181511]">
+      <div className="mb-5 grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] text-[#181511] shadow-[0_0_20px_rgba(212,175,55,0.35)]">
         <Scissors size={22} />
       </div>
 
@@ -317,28 +217,30 @@ function CategoryCard({ category }) {
           : "Productos profesionales"}
       </p>
 
-      <p className="mt-5 font-black text-[#d6a84f]">Ver categoría →</p>
+      <p className={`mt-5 font-black ${goldText}`}>Ver categoría →</p>
     </Link>
   );
 }
 
 function ValueCard({ title, text }) {
   return (
-    <article className="rounded-[2rem] bg-white p-7 shadow-sm ring-1 ring-black/5 transition hover:-translate-y-1 hover:shadow-2xl">
-      <p className="mb-4 text-sm font-black uppercase tracking-[0.25em] text-[#b8872f]">
+    <article className="rounded-[2rem] border border-[#D4AF37]/15 bg-[#24201a] p-7 shadow-sm transition hover:-translate-y-1 hover:border-[#F4E6C3]/45 hover:shadow-[0_0_30px_rgba(212,175,55,0.16)]">
+      <p className={`mb-4 text-sm font-black uppercase tracking-[0.25em] ${goldText}`}>
         Valor
       </p>
-      <h3 className="text-2xl font-black text-[#181511]">{title}</h3>
-      <p className="mt-3 leading-7 text-black/55">{text}</p>
+
+      <h3 className="text-2xl font-black text-white">{title}</h3>
+
+      <p className="mt-3 leading-7 text-white/55">{text}</p>
     </article>
   );
 }
 
 function Testimonial({ text }) {
   return (
-    <article className="rounded-[2rem] bg-white p-7 shadow-sm ring-1 ring-black/5">
-      <Quote className="mb-5 text-[#d6a84f]" />
-      <p className="leading-7 text-black/60">“{text}”</p>
+    <article className="rounded-[2rem] border border-[#D4AF37]/15 bg-[#24201a] p-7 shadow-sm">
+      <Quote className="mb-5 text-[#D4AF37] drop-shadow-[0_0_12px_rgba(212,175,55,0.35)]" />
+      <p className="leading-7 text-white/60">“{text}”</p>
     </article>
   );
 }

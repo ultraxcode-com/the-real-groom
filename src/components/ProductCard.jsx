@@ -1,101 +1,84 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, ShoppingBag } from "lucide-react";
 import { useCart } from "../context/CartContext";
+
+const goldText =
+  "bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] bg-clip-text text-transparent";
 
 export function ProductCard({ product, index = 0 }) {
   const { addToCart } = useCart();
 
   return (
     <motion.article
-      layout
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.4,
-        delay: Math.min(index * 0.04, 0.25),
-      }}
-      className="group overflow-hidden rounded-3xl bg-white shadow-[0_18px_55px_rgba(24,21,17,0.10)] ring-1 ring-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_85px_rgba(24,21,17,0.18)]"
+      transition={{ delay: index * 0.05 }}
+      className="group overflow-hidden rounded-[2rem] border border-[#D4AF37]/15 bg-[#24201a] shadow-[0_10px_40px_rgba(0,0,0,0.4)] transition hover:-translate-y-1 hover:border-[#F4E6C3]/40 hover:shadow-[0_20px_60px_rgba(212,175,55,0.15)]"
     >
-      <Link to={`/producto/${product.id}`} className="block">
-        <div className="relative overflow-hidden bg-[#181511]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#d6a84f33,transparent_35%)]" />
+      <Link to={`/producto/${product.id}`}>
+        {/* Imagen */}
+        <div className="relative h-72 overflow-hidden bg-[#100e0b]">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="h-full w-full object-contain p-6 transition duration-700 group-hover:scale-110"
+          />
 
-          <div className="absolute left-4 top-4 z-10 rounded-xl bg-[#d6a84f] px-3 py-2 text-[10px] font-black uppercase tracking-wide text-[#181511] shadow-lg">
-            Profesional
-          </div>
-
-          {product.stockStatus === "instock" && (
-            <div className="absolute right-4 top-4 z-10 rounded-xl bg-white px-3 py-2 text-[10px] font-black uppercase tracking-wide text-[#181511] shadow-lg">
-              En stock
-            </div>
+          {/* Badge oferta */}
+          {product.on_sale && (
+            <span className="absolute left-4 top-4 rounded-full bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] px-3 py-1 text-xs font-black uppercase tracking-widest text-[#181511] shadow-[0_0_16px_rgba(212,175,55,0.4)]">
+              Oferta
+            </span>
           )}
+        </div>
 
-          <div className="relative grid h-72 place-items-center p-6 md:h-80">
-            <img
-              src={product.image}
-              alt={product.name}
-              loading="lazy"
-              className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
-            />
-          </div>
+        {/* Info */}
+        <div className="p-6">
+          <h3 className="line-clamp-2 text-lg font-black text-white">
+            {product.name}
+          </h3>
 
-          <div className="absolute inset-x-4 bottom-4 hidden translate-y-5 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 md:block">
-            <div className="grid grid-cols-[1fr_auto] gap-3">
-              <div className="flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-black text-[#181511] shadow-xl">
-                <Eye size={17} />
-                Ver detalle
-              </div>
+          <p className="mt-2 text-sm text-white/50">
+            {product.category || "Producto profesional"}
+          </p>
 
+          <div className="mt-5 flex items-center justify-between gap-3">
+            {/* Precio */}
+            <p className={`text-xl font-black ${goldText}`}>
+              {product.priceLabel || "Ver precio"}
+            </p>
+
+            {/* Botones */}
+            <div className="flex gap-2">
+              {/* Añadir */}
               <button
-                type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   addToCart(product);
                 }}
-                className="grid h-12 w-12 place-items-center rounded-xl bg-[#d6a84f] text-[#181511] shadow-xl transition hover:bg-[#b8872f]"
+                className="
+                  rounded-xl 
+                  bg-gradient-to-r 
+                  from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] 
+                  px-4 py-2 
+                  text-xs font-black 
+                  text-[#181511] 
+                  shadow-[0_0_14px_rgba(212,175,55,0.35)]
+                  transition 
+                  hover:shadow-[0_0_22px_rgba(212,175,55,0.55)]
+                "
               >
-                <ShoppingBag size={18} />
+                Añadir
               </button>
+
+              {/* Ver */}
+              <span className="rounded-xl border border-[#D4AF37]/30 px-4 py-2 text-xs font-black text-white/80 transition hover:border-[#F4E6C3]/60 hover:text-white">
+                Ver →
+              </span>
             </div>
           </div>
         </div>
       </Link>
-
-      <div className="p-5 md:p-6">
-        <p className="mb-2 text-[10px] font-black uppercase tracking-[0.25em] text-[#b8872f]">
-          {product.category}
-        </p>
-
-        <Link to={`/producto/${product.id}`}>
-          <h3 className="line-clamp-2 min-h-14 text-lg font-black leading-tight text-[#181511] transition group-hover:text-[#b8872f] md:text-xl">
-            {product.name}
-          </h3>
-        </Link>
-
-        <p className="mt-3 line-clamp-2 text-sm leading-6 text-black/50">
-          {product.description}
-        </p>
-
-        <div className="mt-5 flex items-end justify-between gap-4 border-t border-black/10 pt-5">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-black/35">
-              Precio
-            </p>
-            <p className="text-2xl font-black text-[#181511]">
-              {product.priceLabel}
-            </p>
-            <p className="text-xs font-semibold text-black/40">IVA incluido</p>
-          </div>
-
-          <button
-            onClick={() => addToCart(product)}
-            className="trg-btn px-5 py-3 text-sm"
-          >
-            Añadir
-          </button>
-        </div>
-      </div>
     </motion.article>
   );
 }

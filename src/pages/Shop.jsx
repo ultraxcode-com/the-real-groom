@@ -1,19 +1,25 @@
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
   Search,
-  ShieldCheck,
   SlidersHorizontal,
-  Sparkles,
-  Truck,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { ProductCard } from "../components/ProductCard";
 import { getCategories, getProducts } from "../services/woocommerce";
 
+const goldText =
+  "bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] bg-clip-text text-transparent drop-shadow-[0_0_14px_rgba(212,175,55,0.25)]";
+
+const goldButton =
+  "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] px-6 py-3 font-black text-[#181511] shadow-[0_0_24px_rgba(212,175,55,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_0_34px_rgba(212,175,55,0.55)]";
+
 export function Shop() {
   const scrollRef = useRef(null);
+  const [searchParams] = useSearchParams();
+  const categoryFromUrl = searchParams.get("category");
 
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -32,15 +38,35 @@ export function Shop() {
 
   useEffect(() => {
     async function loadData() {
-      try {
-        const [catData, prodData] = await Promise.all([
-          getCategories(),
-          getProducts({ perPage: 12, page: 1 }),
-        ]);
+      setLoading(true);
 
-        setCategories(catData);
-        setProducts(prodData);
-        setHasMore(prodData.length === 12);
+      try {
+        const catData = await getCategories();
+        const safeCategories = Array.isArray(catData) ? catData : [];
+
+        setCategories(safeCategories);
+
+        const selectedCategory = safeCategories.find(
+          (cat) => String(cat.id) === String(categoryFromUrl)
+        );
+
+        const prodData = await getProducts({
+          perPage: 12,
+          page: 1,
+          categoryId: selectedCategory?.id || undefined,
+        });
+
+        setActiveCategory(
+          selectedCategory || {
+            id: null,
+            name: "Todos",
+          }
+        );
+
+        setProducts(Array.isArray(prodData) ? prodData : []);
+        setHasMore(Array.isArray(prodData) && prodData.length === 12);
+        setPage(1);
+        setSearch("");
       } catch (error) {
         console.error(error);
       } finally {
@@ -49,13 +75,13 @@ export function Shop() {
     }
 
     loadData();
-  }, []);
+  }, [categoryFromUrl]);
 
   const scrollCategories = (direction) => {
     if (!scrollRef.current) return;
 
     scrollRef.current.scrollBy({
-      left: direction === "left" ? -340 : 340,
+      left: direction === "left" ? -280 : 280,
       behavior: "smooth",
     });
   };
@@ -68,8 +94,8 @@ export function Shop() {
 
     try {
       const data = await getProducts({ perPage: 12, page: 1 });
-      setProducts(data);
-      setHasMore(data.length === 12);
+      setProducts(Array.isArray(data) ? data : []);
+      setHasMore(Array.isArray(data) && data.length === 12);
     } catch (error) {
       console.error(error);
     } finally {
@@ -90,8 +116,8 @@ export function Shop() {
         categoryId: category.id,
       });
 
-      setProducts(data);
-      setHasMore(data.length === 12);
+      setProducts(Array.isArray(data) ? data : []);
+      setHasMore(Array.isArray(data) && data.length === 12);
     } catch (error) {
       console.error(error);
     } finally {
@@ -108,17 +134,19 @@ export function Shop() {
       const data = await getProducts({
         perPage: 12,
         page: nextPage,
-        categoryId: activeCategory.id,
+        categoryId: activeCategory.id || undefined,
       });
+
+      const safeData = Array.isArray(data) ? data : [];
 
       setProducts((prev) => {
         const ids = new Set(prev.map((item) => item.id));
-        const unique = data.filter((item) => !ids.has(item.id));
+        const unique = safeData.filter((item) => !ids.has(item.id));
         return [...prev, ...unique];
       });
 
       setPage(nextPage);
-      setHasMore(data.length === 12);
+      setHasMore(safeData.length === 12);
     } catch (error) {
       console.error(error);
     } finally {
@@ -127,101 +155,81 @@ export function Shop() {
   };
 
   const filteredProducts = products.filter((product) => {
-    const text = `${product.name} ${product.category} ${product.description}`.toLowerCase();
+    const text = `
+      ${product.name || ""}
+      ${product.description || ""}
+      ${product.short_description || ""}
+      ${(product.categories || []).map((cat) => cat.name).join(" ")}
+    `.toLowerCase();
+
     return text.includes(search.toLowerCase());
   });
 
   return (
-    <main className="min-h-screen bg-[#f6f0e7]">
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-[420px] bg-[#181511]" />
-        <div className="absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(circle_at_top_right,#d6a84f33,transparent_35%)]" />
+    <main className="min-h-screen bg-[#181511] text-white">
+      <section className="relative overflow-hidden px-4 py-8 md:px-6">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.16),transparent_32%)]" />
 
-        <div className="relative mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55 }}
-            className="grid gap-8 text-white lg:grid-cols-[1.15fr_.85fr] lg:items-end"
-          >
-            <div>
-              <div className="mb-5 inline-flex items-center gap-2 rounded-xl border border-[#d6a84f]/30 bg-[#24201a] px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-[#d6a84f]">
-                <Sparkles size={15} />
-                Catálogo conectado a WooCommerce
+        <div className="relative mx-auto max-w-7xl">
+          <div className="rounded-[2rem] border border-[#D4AF37]/20 bg-[#100e0b] p-5 shadow-[0_25px_80px_rgba(0,0,0,0.35)]">
+            <div className="grid gap-5 lg:grid-cols-[1fr_520px] lg:items-center">
+              <div>
+                <p
+                  className={`mb-2 text-xs font-black uppercase tracking-[0.25em] ${goldText}`}
+                >
+                  Catálogo profesional
+                </p>
+
+                <h1 className="text-3xl font-black leading-tight text-white md:text-4xl">
+                  Tienda para groomers.
+                </h1>
+
+                <p className="mt-2 max-w-xl text-sm leading-6 text-white/55">
+                  Productos profesionales para peluquería canina, cosmética,
+                  herramientas y formación especializada.
+                </p>
               </div>
 
-              <h1 className="max-w-4xl text-5xl font-black leading-[0.92] tracking-tight md:text-7xl">
-                Tienda profesional para groomers.
-              </h1>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="relative w-full">
+                  <Search
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white/45"
+                    size={18}
+                  />
 
-              <p className="mt-5 max-w-2xl text-base leading-7 text-white/70 md:text-lg md:leading-8">
-                Productos reales, imágenes reales, precios reales y categorías
-                cargadas directamente desde WooCommerce.
-              </p>
-            </div>
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Buscar productos..."
+                    className="w-full rounded-xl border border-[#D4AF37]/15 bg-[#24201a] py-4 pl-11 pr-5 font-semibold text-white outline-none placeholder:text-white/45 focus:border-[#F4E6C3]/60 focus:ring-2 focus:ring-[#D4AF37]/20"
+                  />
+                </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <MiniBenefit
-                icon={<Truck size={18} />}
-                title="Envíos 24/48h"
-                text="Logística actual"
-              />
-              <MiniBenefit
-                icon={<ShieldCheck size={18} />}
-                title="Pago seguro"
-                text="WooCommerce"
-              />
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.08 }}
-            className="mt-8 rounded-[2rem] border border-[#d6a84f]/20 bg-[#181511] p-5 shadow-[0_25px_80px_rgba(0,0,0,0.24)]"
-          >
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="relative w-full lg:max-w-lg">
-                <Search
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white/45"
-                  size={18}
-                />
-
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar productos..."
-                  className="w-full rounded-xl border border-white/10 bg-[#24201a] py-4 pl-11 pr-5 font-semibold text-white outline-none placeholder:text-white/45 focus:border-[#d6a84f] focus:ring-2 focus:ring-[#d6a84f]/20"
-                />
+                <button className={goldButton}>
+                  <SlidersHorizontal size={18} />
+                  Filtros
+                </button>
               </div>
-
-              <button className="trg-btn-dark">
-                <SlidersHorizontal size={18} />
-                Filtros
-              </button>
             </div>
 
-            <div className="relative mt-6">
-              <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-12 bg-gradient-to-r from-[#181511] to-transparent" />
-              <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-12 bg-gradient-to-l from-[#181511] to-transparent" />
-
+            <div className="relative mt-4 lg:hidden">
               <button
                 onClick={() => scrollCategories("left")}
-                className="absolute left-0 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-xl bg-[#d6a84f] text-[#181511] shadow-xl transition hover:scale-105"
+                className="absolute left-0 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] text-[#181511] shadow-[0_0_16px_rgba(212,175,55,0.35)]"
               >
                 <ChevronLeft size={20} />
               </button>
 
               <button
                 onClick={() => scrollCategories("right")}
-                className="absolute right-0 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-xl bg-[#d6a84f] text-[#181511] shadow-xl transition hover:scale-105"
+                className="absolute right-0 top-1/2 z-20 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] text-[#181511] shadow-[0_0_16px_rgba(212,175,55,0.35)]"
               >
                 <ChevronRight size={20} />
               </button>
 
               <div
                 ref={scrollRef}
-                className="scrollbar-hide flex gap-3 overflow-x-auto px-12 pb-2"
+                className="flex gap-3 overflow-x-auto px-12 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               >
                 <CategoryButton
                   active={activeCategory.name === "Todos"}
@@ -241,67 +249,99 @@ export function Shop() {
                 ))}
               </div>
             </div>
-          </motion.div>
-
-          <div className="mt-6 flex flex-col gap-3 text-sm font-bold text-black/50 sm:flex-row sm:items-center sm:justify-between">
-            <p>
-              {loading
-                ? "Cargando productos reales..."
-                : `${filteredProducts.length} productos encontrados`}
-            </p>
-
-            <p>
-              {activeCategory.name === "Todos"
-                ? "WooCommerce conectado"
-                : `Categoría: ${activeCategory.name}`}
-            </p>
           </div>
 
-          {loading ? (
-            <div className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <ProductSkeleton key={index} />
-              ))}
-            </div>
-          ) : (
-            <>
-              {filteredProducts.length > 0 ? (
-                <motion.div
-                  layout
-                  className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3"
-                >
-                  {filteredProducts.map((product, index) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      index={index}
-                    />
-                  ))}
-                </motion.div>
-              ) : (
-                <div className="mt-10 rounded-[2rem] bg-white p-10 text-center shadow-sm ring-1 ring-black/5">
-                  <h2 className="text-2xl font-black text-[#181511]">
-                    No encontramos productos
-                  </h2>
-                  <p className="mt-3 text-black/55">
-                    Prueba con otro nombre o cambia de categoría.
-                  </p>
-                </div>
-              )}
+          <div className="mt-5 grid gap-8 lg:grid-cols-[280px_1fr]">
+            <aside className="hidden h-fit rounded-[2rem] border border-[#D4AF37]/20 bg-[#100e0b] p-5 shadow-2xl lg:block">
+              <p
+                className={`mb-5 text-sm font-black uppercase tracking-[0.25em] ${goldText}`}
+              >
+                Categorías
+              </p>
 
-              {hasMore && search.trim() === "" && (
-                <div className="mt-12 text-center">
-                  <button
-                    onClick={loadMoreProducts}
-                    disabled={loadingMore}
-                    className="trg-btn"
-                  >
-                    {loadingMore ? "Cargando..." : "Cargar más productos"}
-                  </button>
+              <div className="space-y-2">
+                <SidebarCategoryButton
+                  active={activeCategory.name === "Todos"}
+                  onClick={handleAllClick}
+                  label="Todos"
+                  count={products.length}
+                />
+
+                {categories.map((category) => (
+                  <SidebarCategoryButton
+                    key={category.id}
+                    active={activeCategory.id === category.id}
+                    onClick={() => handleCategoryClick(category)}
+                    label={category.name}
+                    count={category.count}
+                  />
+                ))}
+              </div>
+            </aside>
+
+            <section>
+              <div className="mb-5 flex flex-col gap-3 text-sm font-bold text-white/50 sm:flex-row sm:items-center sm:justify-between">
+                <p>
+                  {loading
+                    ? "Cargando productos..."
+                    : `${filteredProducts.length} productos encontrados`}
+                </p>
+
+                <p>
+                  {activeCategory.name === "Todos"
+                    ? "Catálogo completo"
+                    : `Categoría: ${activeCategory.name}`}
+                </p>
+              </div>
+
+              {loading ? (
+                <div className="grid gap-7 sm:grid-cols-2 xl:grid-cols-3">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <ProductSkeleton key={index} />
+                  ))}
                 </div>
+              ) : (
+                <>
+                  {filteredProducts.length > 0 ? (
+                    <motion.div
+                      layout
+                      className="grid gap-7 sm:grid-cols-2 xl:grid-cols-3"
+                    >
+                      {filteredProducts.map((product, index) => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          index={index}
+                        />
+                      ))}
+                    </motion.div>
+                  ) : (
+                    <div className="rounded-[2rem] border border-[#D4AF37]/20 bg-[#24201a] p-10 text-center shadow-sm">
+                      <h2 className="text-2xl font-black text-white">
+                        No encontramos productos
+                      </h2>
+
+                      <p className="mt-3 text-white/55">
+                        Prueba con otro nombre o cambia de categoría.
+                      </p>
+                    </div>
+                  )}
+
+                  {hasMore && search.trim() === "" && (
+                    <div className="mt-12 text-center">
+                      <button
+                        onClick={loadMoreProducts}
+                        disabled={loadingMore}
+                        className={goldButton}
+                      >
+                        {loadingMore ? "Cargando..." : "Cargar más productos"}
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
+            </section>
+          </div>
         </div>
       </section>
     </main>
@@ -314,8 +354,8 @@ function CategoryButton({ active, onClick, label, count }) {
       onClick={onClick}
       className={`whitespace-nowrap rounded-xl px-5 py-3 text-sm font-black tracking-wide transition ${
         active
-          ? "bg-[#d6a84f] text-[#181511] shadow-xl"
-          : "bg-[#24201a] text-white/80 ring-1 ring-white/10 hover:bg-[#d6a84f] hover:text-[#181511]"
+          ? "bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] text-[#181511] shadow-[0_0_18px_rgba(212,175,55,0.35)]"
+          : "bg-[#24201a] text-white/80 ring-1 ring-[#D4AF37]/15 hover:text-white"
       }`}
     >
       <span>{label}</span>
@@ -333,29 +373,42 @@ function CategoryButton({ active, onClick, label, count }) {
   );
 }
 
-function MiniBenefit({ icon, title, text }) {
+function SidebarCategoryButton({ active, onClick, label, count }) {
   return (
-    <div className="rounded-2xl border border-[#d6a84f]/20 bg-[#24201a] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.16)]">
-      <div className="mb-3 grid h-10 w-10 place-items-center rounded-xl bg-[#d6a84f] text-[#181511]">
-        {icon}
-      </div>
-      <p className="font-black text-white">{title}</p>
-      <p className="text-sm font-semibold text-white/55">{text}</p>
-    </div>
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-black transition ${
+        active
+          ? "bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] text-[#181511] shadow-[0_0_18px_rgba(212,175,55,0.28)]"
+          : "bg-[#24201a] text-white/70 hover:bg-[#2f2a22] hover:text-white"
+      }`}
+    >
+      <span className="line-clamp-1">{label}</span>
+
+      {typeof count === "number" && (
+        <span
+          className={`ml-3 rounded-md px-2 py-1 text-[10px] ${
+            active ? "bg-black/10 text-[#181511]" : "bg-white/10 text-white/60"
+          }`}
+        >
+          {count}
+        </span>
+      )}
+    </button>
   );
 }
 
 function ProductSkeleton() {
   return (
-    <div className="animate-pulse overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-black/5">
-      <div className="h-80 bg-black/10" />
+    <div className="animate-pulse overflow-hidden rounded-[2rem] border border-[#D4AF37]/10 bg-[#24201a] shadow-sm">
+      <div className="h-80 bg-white/5" />
       <div className="space-y-4 p-6">
-        <div className="h-5 w-3/4 rounded-full bg-black/10" />
-        <div className="h-4 w-full rounded-full bg-black/10" />
-        <div className="h-4 w-2/3 rounded-full bg-black/10" />
+        <div className="h-5 w-3/4 rounded-full bg-white/10" />
+        <div className="h-4 w-full rounded-full bg-white/10" />
+        <div className="h-4 w-2/3 rounded-full bg-white/10" />
         <div className="flex items-center justify-between pt-4">
-          <div className="h-7 w-24 rounded-full bg-black/10" />
-          <div className="h-11 w-24 rounded-xl bg-black/10" />
+          <div className="h-7 w-24 rounded-full bg-white/10" />
+          <div className="h-11 w-24 rounded-xl bg-white/10" />
         </div>
       </div>
     </div>
