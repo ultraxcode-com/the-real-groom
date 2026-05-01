@@ -21,38 +21,18 @@ export function Hero() {
   }, []);
 
   // 🔥 LÓGICA ORIGINAL (NO CAMBIADA)
-  const slides = useMemo(() => {
-    const productsWithImage = products.filter((product) => product.image);
+const slides = useMemo(() => {
+  const selected = products.filter((product) => {
+    const name = (product.name || "").toLowerCase();
 
-    const offerProducts = productsWithImage.filter(
-      (product) => product.on_sale
+    return (
+      name.includes("caja 5 petfume") ||
+      name.includes("white ritual")
     );
+  });
 
-    const petfumeProducts = productsWithImage.filter((product) => {
-      const text = `
-        ${product.name || ""}
-        ${product.description || ""}
-        ${product.short_description || ""}
-        ${(product.categories || []).map((cat) => cat.name).join(" ")}
-      `.toLowerCase();
-
-      return (
-        text.includes("petfume") ||
-        text.includes("perfume") ||
-        text.includes("cosmética") ||
-        text.includes("cosmetica")
-      );
-    });
-
-    const selected =
-      offerProducts.length > 0
-        ? offerProducts
-        : petfumeProducts.length > 0
-        ? petfumeProducts
-        : productsWithImage;
-
-    return selected.slice(0, 5);
-  }, [products]);
+  return selected.filter((product) => product.image).slice(0, 3);
+}, [products]);
 
   useEffect(() => {
     if (active >= slides.length) setActive(0);
