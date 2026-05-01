@@ -5,7 +5,7 @@ import { ArrowRight, BadgeCheck, ShieldCheck, Truck } from "lucide-react";
 import { getProducts } from "../services/woocommerce";
 
 const goldText =
-  "bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] bg-clip-text text-transparent drop-shadow-[0_0_14px_rgba(212,175,55,0.25)]";
+  "bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] bg-clip-text text-transparent";
 
 const goldButton =
   "inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] px-6 py-3 font-black text-[#181511] shadow-[0_0_24px_rgba(212,175,55,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_0_34px_rgba(212,175,55,0.55)]";
@@ -20,9 +20,13 @@ export function Hero() {
       .catch(console.error);
   }, []);
 
+  // 🔥 LÓGICA ORIGINAL (NO CAMBIADA)
   const slides = useMemo(() => {
     const productsWithImage = products.filter((product) => product.image);
-    const offerProducts = productsWithImage.filter((product) => product.on_sale);
+
+    const offerProducts = productsWithImage.filter(
+      (product) => product.on_sale
+    );
 
     const petfumeProducts = productsWithImage.filter((product) => {
       const text = `
@@ -67,135 +71,99 @@ export function Hero() {
   const product = slides[active];
 
   return (
-    <section className="relative min-h-[88vh] overflow-hidden bg-[#181511] px-4 py-16 text-white md:px-6 md:py-24">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.22),transparent_35%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:70px_70px]" />
+    <section className="relative min-h-[88vh] overflow-hidden bg-[#181511] px-4 py-14 text-white md:px-6 md:py-24">
+      {/* Fondo */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,175,55,0.2),transparent_40%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:70px_70px]" />
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-2">
+      <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2">
+        
+        {/* TEXTO */}
         <motion.div
-          initial={{ opacity: 0, y: 34 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
+          className="order-2 lg:order-1"
         >
-          <p
-            className={`mb-4 text-sm font-black uppercase tracking-[0.3em] ${goldText}`}
-          >
+          <p className={`mb-4 text-sm font-black uppercase tracking-[0.3em] ${goldText}`}>
             The Real Groom · Petfume
           </p>
 
-          <h1 className="text-5xl font-black leading-[0.9] md:text-7xl">
-            Alta perfumería natural y grooming profesional.
+          <h1 className="text-4xl font-black leading-[0.95] md:text-6xl">
+            Grooming profesional de alto nivel.
           </h1>
 
-          <p className="mt-6 max-w-2xl text-base leading-8 text-white/65 md:text-lg">
+          <p className="mt-5 max-w-xl text-base leading-7 text-white/65 md:text-lg">
             Productos, herramientas y cosmética profesional para peluquería
-            canina, con una experiencia rápida, limpia y premium.
+            canina. Diseñado por groomers para groomers.
           </p>
 
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link to="/tienda" className={goldButton}>
               Ver tienda <ArrowRight size={18} />
             </Link>
 
             <Link
               to="/contacto"
-              className="inline-flex items-center justify-center rounded-xl border border-[#D4AF37]/25 bg-[#24201a] px-6 py-3 font-black text-white shadow-xl transition hover:-translate-y-0.5 hover:border-[#F4E6C3]/60 hover:shadow-[0_0_24px_rgba(212,175,55,0.2)]"
+              className="rounded-xl border border-[#D4AF37]/25 bg-[#24201a] px-6 py-3 font-black text-white transition hover:border-[#F4E6C3]/60"
             >
-              Hazte distribuidor
+              Distribuidores
             </Link>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            <Benefit icon={<Truck size={22} />} text="Envíos 24/48h" />
-            <Benefit icon={<ShieldCheck size={22} />} text="Pago seguro" />
-            <Benefit icon={<BadgeCheck size={22} />} text="Pro quality" />
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <Benefit icon={<Truck size={18} />} text="24/48h" />
+            <Benefit icon={<ShieldCheck size={18} />} text="Pago seguro" />
+            <Benefit icon={<BadgeCheck size={18} />} text="Calidad pro" />
           </div>
         </motion.div>
 
+        {/* IMAGEN (PRIMERO EN MÓVIL) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="relative"
+          className="relative order-1 lg:order-2"
         >
-          <div className="rounded-[2.5rem] border border-[#D4AF37]/20 bg-[#100e0b] p-3 shadow-2xl">
-            <Link
-              to={product?.id ? `/producto/${product.id}` : "/tienda"}
-              className="group relative block h-[430px] overflow-hidden rounded-[2rem] bg-[#100e0b] md:h-[560px]"
-            >
-              <AnimatePresence mode="wait">
-                {product?.image ? (
-                  <motion.img
-                    key={product.id}
-                    src={product.image}
-                    alt={product.name}
-                    initial={{ opacity: 0, scale: 1.04 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.55 }}
-                    className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <motion.div
-                    key="placeholder"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex h-full w-full items-center justify-center"
-                  >
-                    <div className="text-center">
-                      <div className="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] text-4xl font-black text-[#181511] shadow-[0_0_24px_rgba(212,175,55,0.35)]">
-                        TRG
-                      </div>
-                      <p className="text-white/45">Cargando producto...</p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {product && (
-                <>
-                  <div className="absolute left-5 top-5 z-10 rounded-full bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] px-4 py-2 text-xs font-black uppercase tracking-widest text-[#181511] shadow-[0_0_22px_rgba(212,175,55,0.35)]">
-                    {product.on_sale ? "Oferta" : "Producto destacado"}
-                  </div>
-
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/85 to-transparent p-5 pt-28">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                      <div className="min-w-0">
-                        <p className="line-clamp-2 max-w-md text-xl font-black leading-tight text-white md:text-2xl">
-                          {product.name}
-                        </p>
-
-                        <p className={`mt-2 text-2xl font-black ${goldText}`}>
-                          {product.priceLabel || "Ver precio"}
-                        </p>
-                      </div>
-
-                      <span className="inline-flex shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] px-5 py-4 text-sm font-black text-[#181511] shadow-[0_0_22px_rgba(212,175,55,0.4)] transition group-hover:-translate-y-1">
-                        Ver producto →
-                      </span>
-                    </div>
-                  </div>
-                </>
-              )}
-            </Link>
-          </div>
-
-          {slides.length > 1 && (
-            <div className="mt-5 flex justify-center gap-2">
-              {slides.map((slide, index) => (
-                <button
-                  key={slide.id}
-                  onClick={() => setActive(index)}
-                  aria-label={`Ver producto ${index + 1}`}
-                  className={`h-2.5 rounded-full transition ${
-                    active === index
-                      ? "w-8 bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] shadow-[0_0_14px_rgba(212,175,55,0.45)]"
-                      : "w-2.5 bg-white/25 hover:bg-white/50"
-                  }`}
+          <Link
+            to={product?.id ? `/producto/${product.id}` : "/tienda"}
+            className="group relative block h-[380px] overflow-hidden rounded-[2rem] md:h-[520px]"
+          >
+            <AnimatePresence mode="wait">
+              {product?.image && (
+                <motion.img
+                  key={product.id}
+                  src={product.image}
+                  alt={product.name}
+                  initial={{ opacity: 0, scale: 1.05 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
                 />
-              ))}
+              )}
+            </AnimatePresence>
+
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+
+            {/* Info */}
+            <div className="absolute bottom-4 left-4 right-4">
+              <p className="line-clamp-2 text-lg font-black md:text-xl">
+                {product?.name}
+              </p>
+
+              <div className="mt-3 flex items-center justify-between">
+                <span className={`font-black ${goldText}`}>
+                  {product?.priceLabel || ""}
+                </span>
+
+                <span className="rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] px-4 py-2 text-sm font-black text-[#181511]">
+                  Ver →
+                </span>
+              </div>
             </div>
-          )}
+          </Link>
         </motion.div>
       </div>
     </section>
@@ -204,8 +172,8 @@ export function Hero() {
 
 function Benefit({ icon, text }) {
   return (
-    <div className="rounded-xl border border-[#D4AF37]/15 bg-[#24201a] p-4 text-sm font-bold text-white/70 shadow-sm transition hover:border-[#F4E6C3]/40 hover:shadow-[0_0_20px_rgba(212,175,55,0.16)]">
-      <div className="mb-2 text-[#D4AF37]">{icon}</div>
+    <div className="rounded-lg bg-[#24201a] p-3 text-center text-xs font-bold text-white/70">
+      <div className="mb-1 text-[#D4AF37]">{icon}</div>
       {text}
     </div>
   );
