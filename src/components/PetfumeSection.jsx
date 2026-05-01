@@ -61,7 +61,7 @@ export function PetfumeSection() {
               premium del salón.
             </p>
 
-            <Link to="/tienda" className={`${goldButton} mt-8`}>
+            <Link to="/tienda" className="trg-gold-btn min-h-0 px-5 py-3 text-sm mt-8">
               Ver productos Petfume
               <ArrowRight size={18} />
             </Link>

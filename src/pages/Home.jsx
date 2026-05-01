@@ -53,7 +53,7 @@ export function Home() {
               </h2>
             </div>
 
-            <Link to="/tienda" className={goldButton}>
+            <Link to="/tienda" className=" trg-gold-btn min-h-0 px-5 py-3 text-sm">
               Ver todas
             </Link>
           </div>
@@ -92,7 +92,7 @@ export function Home() {
             </p>
           </div>
 
-          <Link to="/contacto" className={goldButton}>
+          <Link to="/contacto" className="trg-gold-btn min-h-0 px-5 py-3 text-sm">
             Solicitar información
           </Link>
         </div>

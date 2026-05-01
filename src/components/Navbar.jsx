@@ -117,8 +117,8 @@ export function Navbar() {
 
 function CartButton({ cartCount }) {
   return (
-    <Link to="/carrito" className={`${goldButton} relative`}>
-      <ShoppingBag size={18} />
+    <Link to="/carrito" className=" trg-gold-btn relative">
+      <ShoppingBag size={20} />
       Carrito
 
       {cartCount > 0 && (

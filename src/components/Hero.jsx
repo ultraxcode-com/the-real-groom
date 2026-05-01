@@ -155,7 +155,7 @@ Todo lo que necesitas para crecer en la peluquería canina.
                   {product?.priceLabel || ""}
                 </span>
 
-                <span className="trg-gold-btn px-5 py-3 text-sm">
+                <span className="trg-gold-btn min-h-0 px-5 py-3 text-sm">
                   Ver producto <ArrowRight size={16} />
                 </span>
               </div>

@@ -121,7 +121,7 @@ export function Contact() {
                 />
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <button type="button" className={goldButton}>
+                  <button type="button" className="trg-gold-btn">
                     <Send size={18} />
                     Enviar mensaje
                   </button>
@@ -130,7 +130,7 @@ export function Contact() {
                     href={whatsappUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#D4AF37]/25 bg-[#181511] px-6 py-4 font-black text-white/80 transition hover:border-[#F4E6C3]/60 hover:text-white"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-green-400/40 bg-gradient-to-r from-green-600 to-green-400 px-6 py-4 font-black text-white shadow-lg transition hover:-translate-y-0.5 hover:from-green-500 hover:to-green-300 hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]"
                   >
                     <MessageCircle size={18} />
                     WhatsApp

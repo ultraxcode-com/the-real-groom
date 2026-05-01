@@ -48,7 +48,7 @@ export function Courses() {
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2">
           <div>
-            <p className={`mb-3 text-sm font-black uppercase tracking-[0.25em] ${goldText}`}>
+            <p className={`mb-3 text-lg font-black uppercase tracking-[0.25em] ${goldText}`}>
               Formación profesional
             </p>
 
@@ -67,7 +67,7 @@ export function Courses() {
               <Mini icon={<Award />} title="Nivel pro" />
             </div>
 
-            <Link to="/contacto" className={`${goldButton} mt-8`}>
+            <Link to="/contacto" className="trg-gold-btn mt-8">
               Solicitar info
             </Link>
           </div>

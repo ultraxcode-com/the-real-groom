@@ -69,12 +69,12 @@ export function Promociones() {
               <ArrowRight size={20} />
             </button>
 
-            <Link to="/tienda" className={goldButton}>
+            <Link to="/tienda" className="trg-gold-btn min-h-0 px-5 py-3 text-sm">
               Ver tienda
             </Link>
           </div>
 
-          <Link to="/tienda" className={`${goldButton} md:hidden`}>
+          <Link to="/tienda" className="trg-gold-btn min-h-0 px-5 py-3 text-sm md:hidden">
             Ver tienda
           </Link>
         </div>

@@ -125,13 +125,13 @@ export function Cart() {
                 <span className={goldText}>{subtotal.toFixed(2)} €</span>
               </div>
 
-              <button className={`${goldButton} mt-8 w-full`}>
+              <button className="trg-gold-btn mt-8 w-full">
                 Finalizar compra
               </button>
 
               <button
                 onClick={clearCart}
-                className="mt-4 w-full rounded-xl border border-[#D4AF37]/20 px-6 py-3 font-black text-white/70 hover:text-white"
+                className="trg-dark-btn mt-5 w-full "
               >
                 Vaciar carrito
               </button>
