@@ -57,7 +57,7 @@ export function Hero() {
   src={dogGold}
   alt=""
   aria-hidden="true"
-  className="pointer-events-none absolute left-1/2 top-[48%] z-0 h-[360px] -translate-x-1/2 -translate-y-1/2 opacity-90 drop-shadow-[0_0_60px_rgba(212,175,55,0.35)] md:h-[520px] lg:left-[43%] lg:h-[308px]"
+  className="pointer-events-none absolute left-1/2 top-[52%] z-0 h-[240px] -translate-x-1/2 -translate-y-1/2 opacity-55 drop-shadow-[0_0_45px_rgba(212,175,55,0.35)] md:h-[520px] md:opacity-90 lg:left-[43%] lg:top-[48%] lg:h-[308px]"
 />
 
       <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.95fr_0.9fr]">
@@ -66,7 +66,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="order-2 lg:order-1"
+         className="order-2 text-center lg:order-1 lg:text-left"
         >
           <p
             className={`mb-4 text-sm font-black uppercase tracking-[0.35em] ${goldText}`}
@@ -74,8 +74,8 @@ export function Hero() {
             The Real Groom · Petfume
           </p>
 
-         <h1 className="max-w-xl font-bold text-5xl md:text-7xl  tracking-[0.06em] leading-[1.05]">
-Todo lo que necesitas para crecer en la peluquería canina.
+       <h1 className="mx-auto max-w-[360px] text-center text-5xl font-bold leading-[1.05] tracking-[0.03em] md:max-w-xl md:text-7xl lg:mx-0 lg:text-left">
+  Todo lo que necesitas para crecer en tu peluquería canina.
 </h1>
 
     <p className="mt-6 max-w-lg text-base leading-8 text-white/70 md:text-lg">
