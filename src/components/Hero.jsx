@@ -77,7 +77,9 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <p className={`mb-4 text-sm font-black uppercase tracking-[0.3em] ${goldText}`}>
+          <p
+            className={`mb-4 text-sm font-black uppercase tracking-[0.3em] ${goldText}`}
+          >
             The Real Groom · Petfume
           </p>
 
@@ -116,27 +118,23 @@ export function Hero() {
           transition={{ duration: 0.8 }}
           className="relative"
         >
-          <div className="rounded-[2.5rem] border border-[#D4AF37]/20 bg-[#24201a] p-4 shadow-2xl ring-1 ring-[#D4AF37]/20">
+          <div className="rounded-[2.5rem] border border-[#D4AF37]/20 bg-[#100e0b] p-3 shadow-2xl">
             <Link
               to={product?.id ? `/producto/${product.id}` : "/tienda"}
-              className="group relative block h-[420px] overflow-hidden rounded-[2rem] bg-[#100e0b] md:h-[540px]"
+              className="group relative block h-[430px] overflow-hidden rounded-[2rem] bg-[#100e0b] md:h-[560px]"
             >
               <AnimatePresence mode="wait">
                 {product?.image ? (
-                  <motion.div
+                  <motion.img
                     key={product.id}
+                    src={product.image}
+                    alt={product.name}
                     initial={{ opacity: 0, scale: 1.04 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.98 }}
                     transition={{ duration: 0.55 }}
-                    className="flex h-full w-full items-center justify-center p-6"
-                  >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="max-h-full max-w-full object-contain transition duration-700 group-hover:scale-105"
-                    />
-                  </motion.div>
+                    className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-105"
+                  />
                 ) : (
                   <motion.div
                     key="placeholder"
@@ -160,19 +158,19 @@ export function Hero() {
                     {product.on_sale ? "Oferta" : "Producto destacado"}
                   </div>
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/85 to-transparent p-5 pt-28">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                      <div className="min-w-0">
+                        <p className="line-clamp-2 max-w-md text-xl font-black leading-tight text-white md:text-2xl">
+                          {product.name}
+                        </p>
 
-                  <div className="absolute bottom-5 left-5 right-5">
-                    <p className="line-clamp-1 text-xl font-black text-white">
-                      {product.name}
-                    </p>
+                        <p className={`mt-2 text-2xl font-black ${goldText}`}>
+                          {product.priceLabel || "Ver precio"}
+                        </p>
+                      </div>
 
-                    <div className="mt-3 flex items-center justify-between gap-4">
-                      <p className={`font-black ${goldText}`}>
-                        {product.priceLabel || "Ver precio"}
-                      </p>
-
-                      <span className="rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] px-4 py-3 text-sm font-black text-[#181511] shadow-[0_0_22px_rgba(212,175,55,0.35)]">
+                      <span className="inline-flex shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] px-5 py-4 text-sm font-black text-[#181511] shadow-[0_0_22px_rgba(212,175,55,0.4)] transition group-hover:-translate-y-1">
                         Ver producto →
                       </span>
                     </div>
@@ -207,9 +205,7 @@ export function Hero() {
 function Benefit({ icon, text }) {
   return (
     <div className="rounded-xl border border-[#D4AF37]/15 bg-[#24201a] p-4 text-sm font-bold text-white/70 shadow-sm transition hover:border-[#F4E6C3]/40 hover:shadow-[0_0_20px_rgba(212,175,55,0.16)]">
-      <div className="mb-2 bg-gradient-to-r from-[#8C6A2A] via-[#D4AF37] to-[#F4E6C3] bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(212,175,55,0.35)]">
-        {icon}
-      </div>
+      <div className="mb-2 text-[#D4AF37]">{icon}</div>
       {text}
     </div>
   );
